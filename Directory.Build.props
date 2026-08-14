@@ -1,7 +1,5 @@
 <Project>
   <PropertyGroup>
-      <BaseOutputPath>$(MSBuildThisFileDirectory)/build/bin/</BaseOutputPath>
-      <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)/build/obj/</BaseIntermediateOutputPath>
-      <BaseArtifactsPath>$(MSBuildThisFileDirectory)/build/obj/</BaseArtifactsPath>
+      <ArtifactsPath>$(MSBuildThisFileDirectory)/build</ArtifactsPath>
   </PropertyGroup>
 </Project>

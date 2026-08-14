@@ -1,4 +1,4 @@
-using ABP.Domain;
+using ABP.Domain.Entities;
 using NUnit;
 
 namespace ABP.Tests.Domain;
@@ -29,17 +29,17 @@ public class RoomTests {
 
     [Test]
     public void SetName_Invalid_Null() { 
-        Assert.That(() => room.Name = null, Throws.InvalidOperationException);
+        Assert.That(() => room.Name = null, Throws.ArgumentException);
     }
 
     [Test]
     public void SetName_Invalid_Empty() { 
-        Assert.That(() => room.Name = string.Empty, Throws.InvalidOperationException);
+        Assert.That(() => room.Name = string.Empty, Throws.ArgumentException);
     }
 
     [Test]
     public void SetName_Invalid_Whitespace() { 
-        Assert.That(() => room.Name = " ", Throws.InvalidOperationException);
+        Assert.That(() => room.Name = " ", Throws.ArgumentException);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class RoomTests {
 
     [Test]
     public void SetCapacity_Invalid() {
-        Assert.That(() => room.Capacity = 0, Throws.InvalidOperationException);
+        Assert.That(() => room.Capacity = 0, Throws.ArgumentException);
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class RoomTests {
 
     [Test]
     public void SetBasePrice_Invalid() {
-        Assert.That(() => room.BasePrice = 0, Throws.InvalidOperationException);
+        Assert.That(() => room.BasePrice = 0, Throws.ArgumentException);
     }
 
     [Test]
