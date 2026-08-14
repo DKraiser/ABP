@@ -3,11 +3,13 @@ using System.Text.Unicode;
 namespace ABP.Domain;
 
 public class Room { 
+    private string _id;
     private string _name;
     private int _capacity;
     private decimal _basePrice;
     private readonly List<Service> _services = [];
 
+    public string Id => _id;
     public string Name { 
         get => _name;
         set {
@@ -35,6 +37,7 @@ public class Room {
     public List<Service> Services => _services;
 
     public Room (string name, int capacity, decimal basePrice, List<Service> services) {
+        _id = new Guid().ToString();
         Name = name;
         Capacity = capacity;
         BasePrice = basePrice;

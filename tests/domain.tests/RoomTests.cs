@@ -10,7 +10,7 @@ public class RoomTests {
 
     [SetUp]
     public void SetUp() { 
-        service = new Service(0, "WiFi", 300);
+        service = new Service("WiFi", 300);
 
         List<Service> services = [ service ]; 
         room = new Room("A", 50, 2000, services);
@@ -57,7 +57,6 @@ public class RoomTests {
     public void SetCapacity_Invalid() {
         Assert.That(() => room.Capacity = 0, Throws.InvalidOperationException);
     }
-
 
     [Test]
     public void GetBasePrice() {
