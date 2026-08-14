@@ -34,7 +34,7 @@ public class Result(bool IsSuccessful, Error? Error = null) {
 /// else - an error object.
 /// </summary> 
 /// <typeparam name="T">Represents a type of result.</typeparam>
-public class Result<T>(bool IsSuccessful, T? Value = null, Error? Error = null) : Result(IsSuccessful, Error) where T : class {
+public class Result<T>(bool IsSuccessful, T? Value = null, Error? Error = null) : Result(IsSuccessful, Error) where T : class? {
     
     /// <summary>
     /// Gets a value returned if an operation finished successfully.

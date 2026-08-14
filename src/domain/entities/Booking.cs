@@ -36,7 +36,7 @@ public class Booking {
         get => _startTime;
         set { 
             if (value >= _endTime)
-                throw new ArgumentException("Start time must be greater than end time.");
+                throw new ArgumentException("Start time must be lower than end time.");
             _startTime = value;
         }
     }
@@ -49,7 +49,7 @@ public class Booking {
         get => _endTime;
         set { 
             if (value <= _startTime)
-                throw new ArgumentException("End time must be higher than start time.");
+                throw new ArgumentException("End time must be greater than start time.");
             _endTime = value;            
         }
     }
@@ -65,8 +65,11 @@ public class Booking {
 
         _id = Guid.NewGuid().ToString();
         _room = room;
-        EndTime = endTime;
-        StartTime = startTime;
+        
+        if (startTime.Date == endTime.Date && startTime < endTime) {
+            _startTime = startTime;
+            _endTime = endTime;
+        } 
     }
 
     /// <summary>
