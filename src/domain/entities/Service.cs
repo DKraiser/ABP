@@ -54,6 +54,16 @@ public class Service {
     }
 
     /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="other">Service to be copied.</param>
+    public Service (Service other) {
+        _id = other._id;
+        _name = other._name;
+        _price = other._price;
+    }
+
+    /// <summary>
     /// Overrided equality, compared by fields.
     /// </summary>
     /// <param name="obj">Another instance this compared with.</param>

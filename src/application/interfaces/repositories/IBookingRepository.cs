@@ -7,9 +7,9 @@ namespace ABP.Application.Interfaces.Repositories;
 /// Abstraction of storage of booking records. 
 /// </summary>
 public interface IBookingRepository { 
-    public Task<string> Add(Booking room);
+    public Task Add(Booking room);
     public Task Update(Booking room);
-    public Task Delete(string id);
+    public Task Remove(string id);
     public Task<Booking?> FindById(string id);
-    public Task<IEnumerable<Booking>> FindByDate(DateTime from, DateTime to);
+    public Task<IEnumerable<Booking>> FindByDateTime(DateTime from, DateTime to);
 }

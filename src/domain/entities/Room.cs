@@ -80,6 +80,18 @@ public class Room {
         Services.AddRange(services);
     }
 
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="other">Room to be copied.</param>
+    public Room (Room other) { 
+        _id = other._id;
+        _name = other._name;
+        _capacity = other._capacity;
+        _basePrice = other._basePrice;
+        _services.AddRange(other._services.Select(s => new Service(s)));
+    }
+    
     public override bool Equals(object? obj)
     {
         if (obj is null) return false;

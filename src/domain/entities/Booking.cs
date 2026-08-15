@@ -73,6 +73,17 @@ public class Booking {
     }
 
     /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="other">Booking to be copied.</param>
+    public Booking (Booking other) { 
+        _id = other.Id;
+        _room = new (other._room);
+        _startTime = other._startTime;
+        _endTime = other._endTime;
+    }
+
+    /// <summary>
     /// Check if 2 bookings overlaps.
     /// </summary>
     /// <param name="other">Other booking object.</param>
