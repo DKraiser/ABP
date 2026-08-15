@@ -3,7 +3,7 @@ namespace ABP.Domain.Entities;
 /// <summary>
 /// Provides an entity of service providen by certain room.
 /// </summary>
-public class Service { 
+public class Service : IEquatable<Service>{ 
     private readonly string _id;
     private string _name;
     private decimal _price;
@@ -64,13 +64,21 @@ public class Service {
     }
 
     /// <summary>
-    /// Overrided equality, compared by fields.
+    /// Value equality check.
     /// </summary>
-    /// <param name="obj">Another instance this compared with.</param>
-    /// <returns>`true`, if are equal.</returns>
-    public override bool Equals(object? obj)
-    {
-        if (obj is null) return false;
-        return Id == (obj as Service)?.Id && Name == (obj as Service)?.Name && Price == (obj as Service)?.Price;
+    /// <param name="other">Another instance this compared with.</param>
+    public bool Equals(Service? other) {
+        if (other is null) return false;
+        return _id == other._id && 
+            _name == other._name &&
+            _price == other._price;
     }
+
+    public override bool Equals(object? obj) {
+        if (obj is not Service) return false;
+        else return Equals(obj as Service);
+    }
+
+    public override int GetHashCode() => 
+        HashCode.Combine(_id, _name, _price);
 }

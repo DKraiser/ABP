@@ -3,7 +3,7 @@ namespace ABP.Domain.Entities;
 /// <summary>
 /// Object representing booking of a room. 
 /// </summary>
-public class Booking { 
+public class Booking : IEquatable<Booking> { 
     private readonly string _id;
     private Room _room;
     private DateTime _startTime;
@@ -95,4 +95,24 @@ public class Booking {
             this.EndTime > other.StartTime && this.StartTime >= other.EndTime) return false;
         else return true;
     }
+
+    /// <summary>
+    /// Value equality check.
+    /// </summary>
+    /// <param name="other">Another instance this compared with.</param>
+    public bool Equals(Booking? other) {
+        if (other is null) return false;
+        return _id == other._id && 
+            _room.Equals(other._room) &&
+            _startTime == other._startTime &&
+            _endTime == other._endTime;
+    }
+
+    public override bool Equals(object? obj) {
+        if (obj is not Booking) return false;
+        else return Equals(obj as Booking);
+    }
+
+    public override int GetHashCode() => 
+        HashCode.Combine(_id, _room, _startTime);
 }

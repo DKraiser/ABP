@@ -5,7 +5,7 @@ namespace ABP.Domain.Entities;
 /// <summary>
 /// Provides an entity of a room.
 /// </summary>
-public class Room { 
+public class Room : IEquatable<Room>{ 
     private readonly string _id;
     private string _name;
     private int _capacity;
@@ -92,11 +92,25 @@ public class Room {
         _services.AddRange(other._services.Select(s => new Service(s)));
     }
     
-    public override bool Equals(object? obj)
-    {
-        if (obj is null) return false;
-        
-        if ((obj as Room)?.Id == this.Id) return true;
-        else return false;
+    /// <summary>
+    /// Value equality check.
+    /// </summary>
+    /// <param name="room">Another room, examined for equality.</param>
+    public bool Equals(Room? room) {
+        if (room is null) return false;
+        return room._id == _id && 
+            room._name == _name &&
+            room._basePrice == _basePrice && 
+            room._capacity == _capacity &&
+            room._services.All(s => _services.Contains(s)) &&
+            room._services.Count == _services.Count;
     }
+
+    public override bool Equals(object? obj) {
+        if (obj is not Room) return false;
+        else return Equals(obj as Room);
+    }
+
+    public override int GetHashCode() => 
+        HashCode.Combine(_id, _capacity, _name);
 }

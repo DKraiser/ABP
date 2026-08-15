@@ -53,4 +53,23 @@ public class ServiceTests {
     public void SetPrice_Invalid() {
         Assert.That(() => service.Price = 0, Throws.ArgumentException);
     }
+
+    [Test]
+    public void Equals_True_Same() {
+        var addressCopy = service;
+        Assert.That(addressCopy, Is.EqualTo(service));
+        Assert.That(() => addressCopy == service, Is.True);
+    }
+
+    [Test]
+    public void Equals_True_Copy() {
+        var copy = new Service(service);
+        Assert.That(copy, Is.EqualTo(service));
+        Assert.That(() => copy == service, Is.False);
+    }
+
+    [Test]
+    public void GetHashCode_DoesNotThrow() {
+        Assert.DoesNotThrow(() => service.GetHashCode());
+    }
 }

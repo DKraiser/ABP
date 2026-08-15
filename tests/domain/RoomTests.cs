@@ -79,4 +79,23 @@ public class RoomTests {
         Assert.That(room.Services, Has.Count.EqualTo(1));
         Assert.That(room.Services[0], Is.EqualTo(service));
     }
+
+    [Test]
+    public void Equals_True_Same() {
+        var addressCopy = room;
+        Assert.That(addressCopy, Is.EqualTo(room));
+        Assert.That(() => addressCopy == room, Is.True);
+    }
+
+    [Test]
+    public void Equals_True_Copy() {
+        var copy = new Room(room);
+        Assert.That(copy, Is.EqualTo(room));
+        Assert.That(() => copy == room, Is.False);
+    }
+
+    [Test]
+    public void GetHashCode_DoesNotThrow() {
+        Assert.DoesNotThrow(() => room.GetHashCode());
+    }
 }

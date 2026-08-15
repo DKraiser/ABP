@@ -69,6 +69,20 @@ public class BookingTests {
         Assert.That(() => booking.EndTime = new DateTime(2000, 1, 1, 7, 0, 0), Throws.ArgumentException);
     }
 
+    [Test]
+    public void Equals_True_Same() {
+        var addressCopy = booking;
+        Assert.That(addressCopy, Is.EqualTo(booking));
+        Assert.That(() => addressCopy == booking, Is.True);
+    }
+
+    [Test]
+    public void Equals_True_Copy() {
+        var copy = new Booking(booking);
+        Assert.That(copy, Is.EqualTo(booking));
+        Assert.That(() => copy == booking, Is.False);
+    }
+
     // |------A------|
     // |------B------|
     //
@@ -188,5 +202,11 @@ public class BookingTests {
     public void Overlaps_True_This_OverlapsRightSegment() {
         var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0));
         Assert.That(booking.Overlaps(anotherBooking), Is.True);
+    }
+
+
+    [Test]
+    public void GetHashCode_DoesNotThrow() {
+        Assert.DoesNotThrow(() => booking.GetHashCode());
     }
 }
