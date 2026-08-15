@@ -7,8 +7,9 @@ namespace ABP.Application.Interfaces.Repositories;
 /// Abstraction of storage of rooms. 
 /// </summary>
 public interface IRoomRepository { 
-    public Task Add(Room room);
-    public Task Update(Room room);
-    public Task Remove(string id);
-    public Task<Room?> FindById(string id);
+    public Task AddAsync(Room room);
+    public Task UpdateAsync(Room room);
+    public Task RemoveAsync(string id);
+    public Task<Room?> FindByIdAsync(string id);
+    public Task<IEnumerable<Room>> GetAllAsync();
 }

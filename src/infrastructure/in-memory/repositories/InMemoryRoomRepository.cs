@@ -16,7 +16,7 @@ public class InMemoryRoomRepository : IRoomRepository {
     /// Duplicate of the room is stored. If the room with this id already exists, operation is ignored. 
     /// </remarks>
     /// <param name="room">Room to be stored.</param>
-    public async Task Add(Room room)
+    public async Task AddAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
             _repository.Add(new (room));
@@ -29,7 +29,7 @@ public class InMemoryRoomRepository : IRoomRepository {
     /// If the room with this id does not exist, operation is ignored. 
     /// </remarks>
     /// <param name="room">Id of room to be removed.</param>
-    public async Task Remove(string id)
+    public async Task RemoveAsync(string id)
     {
         _repository.RemoveAll(r => r.Id == id);
     }
@@ -41,7 +41,7 @@ public class InMemoryRoomRepository : IRoomRepository {
     /// Duplicate of the room is returned. 
     /// </remarks>
     /// <param name="id">Id of room to find.</param>
-    public async Task<Room?> FindById(string id)
+    public async Task<Room?> FindByIdAsync(string id)
     {
         var room = _repository.Find(r => r.Id == id);
 
@@ -54,11 +54,22 @@ public class InMemoryRoomRepository : IRoomRepository {
     /// </summary>
     /// <exception cref="ArgumentException">if room with this id does not exist.</exception>
     /// <param name="room">Updated room data.</param>
-    public async Task Update(Room room)
+    public async Task UpdateAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
-            throw new ArgumentException("Room with this id does not exist.");
+            throw new InvalidOperationException("Room with this id does not exist.");
         
         _repository[_repository.FindIndex(r => r.Id == room.Id)] = room;
+    }
+
+    /// <summary>
+    /// Get all repository elements.
+    /// </summary>
+    /// <returns>Collection of repository elements.</returns>
+    public async Task<IEnumerable<Room>> GetAllAsync() { 
+        if (_repository.Count is 0) return [];
+        var result = new List<Room>();
+        result.AddRange(_repository.Select(r => new Room(r)));
+        return result;
     }
 }

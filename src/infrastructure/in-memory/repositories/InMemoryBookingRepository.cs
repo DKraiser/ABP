@@ -13,7 +13,7 @@ public class InMemoryBookingRepository : IBookingRepository {
     /// Duplicate of the booking is stored. If the booking with this id already exists, operation is ignored. 
     /// </remarks>
     /// <param name="booking">Booking to be stored.</param>
-    public async Task Add(Booking booking)
+    public async Task AddAsync(Booking booking)
     {
         if (_repository.Find(b => b.Id == booking.Id) is null)
             _repository.Add(booking);
@@ -26,7 +26,7 @@ public class InMemoryBookingRepository : IBookingRepository {
     /// If the booking with this id does not exist, operation is ignored. 
     /// </remarks>
     /// <param name="booking">Id of booking to be removed.</param>
-    public async Task Remove(string id)
+    public async Task RemoveAsync(string id)
     {
         _repository.RemoveAll(b => b.Id == id);
     }
@@ -38,7 +38,7 @@ public class InMemoryBookingRepository : IBookingRepository {
     /// Duplicate of the booking is returned. 
     /// </remarks>
     /// <param name="id">Id of booking to find.</param>
-    public async Task<Booking?> FindById(string id)
+    public async Task<Booking?> FindByIdAsync(string id)
     {
         var booking = _repository.Find(b => b.Id == id);
         
@@ -54,7 +54,7 @@ public class InMemoryBookingRepository : IBookingRepository {
     /// </remarks>
     /// <param name="from">Lower limit of search.</param>
     /// <param name="to">Upper limit of search.</param>
-    public async Task<IEnumerable<Booking>> FindByDateTime(DateTime from, DateTime to) {
+    public async Task<IEnumerable<Booking>> FindByDateTimeAsync(DateTime from, DateTime to) {
         return _repository.FindAll(b => b.StartTime >= from && b.EndTime <= to);
     }
 
@@ -63,11 +63,22 @@ public class InMemoryBookingRepository : IBookingRepository {
     /// </summary>
     /// <exception cref="ArgumentException">if booking with this id does not exist.</exception>
     /// <param name="booking">Updated booking data.</param>
-    public async Task Update(Booking booking)
+    public async Task UpdateAsync(Booking booking)
     {
         if (_repository.Find(b => b.Id == booking.Id) is null)
-            throw new ArgumentException("Booking with this id does not exist.");
+            throw new InvalidOperationException("Booking with this id does not exist.");
         
         _repository[_repository.FindIndex(b => b.Id == booking.Id)] = booking;
+    }
+
+    /// <summary>
+    /// Get all repository elements.
+    /// </summary>
+    /// <returns>Collection of repository elements.</returns>
+    public async Task<IEnumerable<Booking>> GetAllAsync() { 
+        if (_repository.Count is 0) return [];
+        var result = new List<Booking>();
+        result.AddRange(_repository.Select(b => new Booking(b)));
+        return result;
     }
 }
