@@ -76,8 +76,8 @@ public class RoomTests {
 
     [Test]
     public void GetServices() {
-        Assert.That(room.Services, Has.Count.EqualTo(1));
-        Assert.That(room.Services[0], Is.EqualTo(service));
+        Assert.That(room.AvailableServices, Has.Count.EqualTo(1));
+        Assert.That(room.AvailableServices[0], Is.EqualTo(service));
     }
 
     [Test]

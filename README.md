@@ -23,7 +23,9 @@ To run application:
 # To run use
 dotnet run src/api
 
-# To run tests use
+# To run all tests use
+dotnet test
+# And for specific tests use
 dotnet test tests/[tested_layer]
 ```
 
@@ -31,9 +33,8 @@ API overview: `http://localhost:8080/scalar`
 
 ## To do (most to least valuable)
 
-- Usecases
-- Infrastructure (repos)
+- Usecases + tests
 - API
-- Testing
 - Documentation 
+- Configurations
 - Metrics

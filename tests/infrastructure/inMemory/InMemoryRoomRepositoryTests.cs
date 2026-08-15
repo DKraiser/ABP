@@ -77,7 +77,7 @@ public class InMemoryRoomRepositoryTests {
         var updatedRoom = await repository.FindByIdAsync(room.Id);
 
         updatedRoom?.BasePrice = 3000;
-        updatedRoom?.Services.Add(new Service ("Internet", 500));
+        updatedRoom?.AvailableServices.Add(new Service ("Internet", 500));
 
         await repository.UpdateAsync(updatedRoom);
 
