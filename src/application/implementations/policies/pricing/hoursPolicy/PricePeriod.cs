@@ -1,14 +1,14 @@
-namespace ABP.Application.Implementations.Pricing;
+namespace ABP.Application.Implementations.Policies.Pricing.HoursPolicy;
 
 /// <summary>
 /// Value object used pricing policy based on price periods.
 /// </summary>
 public class PricePeriod { 
-    TimeOnly StartTime { get; init; }
-    TimeOnly EndTime { get; init; }
-    float Multiplier { get; init; }
+    public TimeOnly StartTime { get; init; }
+    public TimeOnly EndTime { get; init; }
+    public decimal Multiplier { get; init; }
 
-    public PricePeriod (TimeOnly startTime, TimeOnly endTime, float multiplier) { 
+    public PricePeriod (TimeOnly startTime, TimeOnly endTime, decimal multiplier) { 
         if (startTime >= endTime) throw new ArgumentException("Price period duration must be a positive number.");
         if (multiplier <= 0) throw new ArgumentException("Price multiplier must be a positive number.");
         StartTime = startTime;

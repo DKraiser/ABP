@@ -1,6 +1,6 @@
 using ABP.Domain.Entities;
 
-namespace ABP.Application.Interfaces;
+namespace ABP.Application.Interfaces.Policies;
 
 /// <summary>
 /// Mechanism calculating price of booking according to concrete pricing policy.

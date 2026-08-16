@@ -65,15 +65,13 @@ public class Booking : IEquatable<Booking> {
     /// <param name="endTime">Booking end time.</param>
     public Booking (Room room, DateTime startTime, DateTime endTime, IEnumerable<Service> requestedServices) { 
         ArgumentNullException.ThrowIfNull(room);
+        if (startTime >= endTime)
+            throw new ArgumentException("Booking period duration must be positive");
 
         _id = Guid.NewGuid().ToString();
         _room = room;
-        
-        if (startTime.Date == endTime.Date && startTime < endTime) {
-            _startTime = startTime;
-            _endTime = endTime;
-        }
-
+        _startTime = startTime;
+        _endTime = endTime;
         _requestedServices = [];
         foreach (var s in requestedServices) _requestedServices.Add(new (s));
     }
@@ -97,7 +95,7 @@ public class Booking : IEquatable<Booking> {
     /// <param name="other">Other booking object.</param>
     /// <returns>Whether 2 bookings overlaps.</returns>
     public bool Overlaps (Booking other) { 
-        if (this.Room != other.Room) return false;
+        if (!this.Room.Equals(other.Room)) return false;
         
         if (this.StartTime < other.EndTime && this.EndTime <= other.StartTime ||
             this.EndTime > other.StartTime && this.StartTime >= other.EndTime) return false;

@@ -13,7 +13,7 @@ public class InMemoryBookingRepositoryTests {
     [SetUp]
     public async Task SetUp() {
         room = new ("A", 50, 2000, []);
-        booking = new (room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0));
+        booking = new (room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
         repository = new ();
         await repository.AddAsync(booking);
     }
@@ -33,7 +33,7 @@ public class InMemoryBookingRepositoryTests {
 
     [Test]
     public async Task AddBooking_New() { 
-        var newBooking = new Booking (room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0));
+        var newBooking = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
         Assert.That(await repository.FindByIdAsync(newBooking.Id), Is.Null);
 
         await repository.AddAsync(newBooking);
@@ -93,7 +93,7 @@ public class InMemoryBookingRepositoryTests {
 
     [Test]
     public async Task UpdateBooking_NotExisting() {
-        var newBooking = new Booking (room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0));
+        var newBooking = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
         Assert.That(async () => await repository.UpdateAsync(newBooking), Throws.InvalidOperationException);
     }
 
@@ -108,10 +108,10 @@ public class InMemoryBookingRepositoryTests {
 
     [Test]
     public async Task FindByDateTime() {
-        var booking1 = new Booking (room, new DateTime(2000, 1, 1, 12, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0));
-        var booking2 = new Booking (room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0));
-        var booking3 = new Booking (room, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 10, 0, 0));
-        var booking4 = new Booking (room, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 14, 0, 0));
+        var booking1 = new Booking(room, new DateTime(2000, 1, 1, 12, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0), []);
+        var booking2 = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
+        var booking3 = new Booking(room, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 10, 0, 0), []);
+        var booking4 = new Booking(room, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 14, 0, 0), []);
         await repository.AddAsync(booking1);
         await repository.AddAsync(booking2);
         await repository.AddAsync(booking3);
