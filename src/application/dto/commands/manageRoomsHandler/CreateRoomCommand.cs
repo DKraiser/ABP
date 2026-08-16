@@ -4,7 +4,7 @@ namespace ABP.Application.Dto.Commands.ManageRoomsHandler;
 
 public record CreateRoomCommand(
     string? Name = null, 
-    int NewCapacity = 0, 
-    decimal NewBasePrice = -1, 
-    IEnumerable<Service>? Services = null
+    int Capacity = 0, 
+    decimal BasePrice = 0, 
+    List<Service>? Services = null
 );

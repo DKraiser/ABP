@@ -1,9 +1,15 @@
 using ABP.Application.Interfaces.Repositories;
 using ABP.Domain.Entities;
 
-namespace ABP.Infrastructure.InMemory.Repositories;
+namespace ABP.Infrastructure.Repositories.InMemory.Soft;
 
-public class InMemoryBookingRepository : IBookingRepository {
+/// <summary>
+/// Soft in-memory booking storage implementation.
+/// </summary>
+/// <remarks>
+/// Soft means that if entry with this id already exists, operation is silently ignored.
+/// </remarks>
+public class InMemorySoftBookingRepository : IBookingRepository {
     private readonly List<Booking> _repository = [];
 
     /// <summary>
@@ -65,9 +71,7 @@ public class InMemoryBookingRepository : IBookingRepository {
     /// <param name="booking">Updated booking data.</param>
     public async Task UpdateAsync(Booking booking)
     {
-        if (_repository.Find(b => b.Id == booking.Id) is null)
-            throw new InvalidOperationException("Booking with this id does not exist.");
-        
+        if (_repository.Find(b => b.Id == booking.Id) is null) return;
         _repository[_repository.FindIndex(b => b.Id == booking.Id)] = booking;
     }
 

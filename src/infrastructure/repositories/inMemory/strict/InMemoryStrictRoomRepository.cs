@@ -1,21 +1,25 @@
 using ABP.Application.Interfaces.Repositories;
 using ABP.Domain.Entities;
 
-namespace ABP.Infrastructure.InMemory.Repositories;
+namespace ABP.Infrastructure.Repositories.InMemory.Strict;
 
 /// <summary>
-/// In-memory room storage implementation.
+/// Strict in-memory room storage implementation.
 /// </summary>
-public class InMemoryRoomRepository : IRoomRepository {
+/// <remarks>
+/// Soft means that if entry with this id already exists (for add/update) or missing (for remove), operation throws an exception.
+/// </remarks>
+public class InMemoryStrictRoomRepository : IRoomRepository {
     private readonly List<Room> _repository = [];
 
     /// <summary>
     /// Adds a new room to repository.
     /// </summary>
     /// <remarks>
-    /// Duplicate of the room is stored. If the room with this id already exists, operation is ignored. 
+    /// Duplicate of the room is stored. 
     /// </remarks>
     /// <param name="room">Room to be stored.</param>
+    /// <exception cref="InvalidArgumentException">if the room with this id already exists.</exception>
     public async Task AddAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
@@ -25,10 +29,8 @@ public class InMemoryRoomRepository : IRoomRepository {
     /// <summary>
     /// Removes room with `id` to repository.
     /// </summary>
-    /// <remarks>
-    /// If the room with this id does not exist, operation is ignored. 
-    /// </remarks>
     /// <param name="room">Id of room to be removed.</param>
+    /// <exception cref="InvalidArgumentException">if the room with this id does not exist.</exception>
     public async Task RemoveAsync(string id)
     {
         _repository.RemoveAll(r => r.Id == id);
@@ -52,8 +54,8 @@ public class InMemoryRoomRepository : IRoomRepository {
     /// <summary>
     /// Updates room data.
     /// </summary>
-    /// <exception cref="ArgumentException">if room with this id does not exist.</exception>
     /// <param name="room">Updated room data.</param>
+    /// <exception cref="InvalidOperationException">if booking with this id does not exist.</exception>
     public async Task UpdateAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)

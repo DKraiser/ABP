@@ -1,12 +1,12 @@
 using NUnit;
 using ABP.Domain.Entities;
-using ABP.Infrastructure.InMemory.Repositories;
+using ABP.Infrastructure.Repositories.InMemory.Soft;
 
-namespace ABP.Tests.Infrastructure.InMemory.Repositories;
+namespace ABP.Tests.Infrastructure.Repositories.InMemory.Soft;
 
 [TestFixture]
-public class InMemoryBookingRepositoryTests {
-    InMemoryBookingRepository repository;
+public class InMemorySoftBookingRepositoryTests {
+    InMemorySoftBookingRepository repository;
     Booking booking;
     Room room;
 
@@ -94,7 +94,7 @@ public class InMemoryBookingRepositoryTests {
     [Test]
     public async Task UpdateBooking_NotExisting() {
         var newBooking = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
-        Assert.That(async () => await repository.UpdateAsync(newBooking), Throws.InvalidOperationException);
+        Assert.DoesNotThrowAsync(async () => await repository.UpdateAsync(newBooking));
     }
 
     [Test]

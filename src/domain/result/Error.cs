@@ -10,7 +10,7 @@ namespace ABP.Domain.Result;
 /// <param name="problems">A dictionary of problems.</param>
 public class Error(string title, IDictionary<string, string[]>? problems)
 {
-
+    
     /// <summary>
     /// Gets and initializes a title of an `Error` object.
     /// </summary>

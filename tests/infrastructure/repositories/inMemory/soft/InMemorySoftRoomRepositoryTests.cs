@@ -1,13 +1,13 @@
 using NUnit;
 using ABP.Domain.Entities;
-using ABP.Infrastructure.InMemory.Repositories;
+using ABP.Infrastructure.Repositories.InMemory.Soft;
 
-namespace ABP.Tests.Infrastructure.InMemory.Repositories;
+namespace ABP.Tests.Infrastructure.Repositories.InMemory.Soft;
 
 [TestFixture]
-public class InMemoryRoomRepositoryTests {
+public class InMemorySoftRoomRepositoryTests {
+    InMemorySoftRoomRepository repository;
     Room room;
-    InMemoryRoomRepository repository;
 
     [SetUp]
     public async Task SetUp() {
@@ -95,7 +95,7 @@ public class InMemoryRoomRepositoryTests {
     public async Task UpdateRoom_NotExisting() {
         var service = new Service ("Internet", 500);
         var newRoom = new Room ("B", 100, 3000, [ service ]);
-        Assert.That(async () => await repository.UpdateAsync(newRoom), Throws.InvalidOperationException);
+        Assert.DoesNotThrowAsync(async () => await repository.UpdateAsync(newRoom));
     }
 
     [Test]

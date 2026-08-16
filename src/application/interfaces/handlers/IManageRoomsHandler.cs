@@ -8,7 +8,7 @@ namespace ABP.Application.Interfaces.Handlers;
 /// CRUD handler for rooms. 
 /// </summary>
 public interface IManageRoomsHandler {
-    public Task<Result<string>> Add(CreateRoomCommand command);
-    public Task<Result> Update(UpdateRoomCommand command);
-    public Task<Result> Delete(DeleteRoomCommand command);
+    public Task<Result<string>> AddAsync(CreateRoomCommand command);
+    public Task<Result> UpdateAsync(UpdateRoomCommand command);
+    public Task<Result> DeleteAsync(DeleteRoomCommand command);
 }

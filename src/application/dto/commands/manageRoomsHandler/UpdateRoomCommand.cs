@@ -7,7 +7,7 @@ public record UpdateRoomCommand(
     string? NewName = null, 
     int NewCapacity = 0, 
     decimal NewBasePrice = -1, 
-    IEnumerable<Service>? NewServices = null,
-    IEnumerable<Service>? UpdatedServices = null,
-    IEnumerable<Service>? DeletedServices = null
+    List<Service>? NewServices = null,
+    List<Service>? UpdatedServices = null,
+    List<Service>? DeletedServices = null
 );
