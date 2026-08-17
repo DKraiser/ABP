@@ -1,5 +1,6 @@
 using ABP.Application.Interfaces.Repositories;
 using ABP.Domain.Entities;
+using ABP.Application.Exceptions;
 
 namespace ABP.Infrastructure.Repositories.InMemory.Strict;
 
@@ -24,6 +25,7 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
             _repository.Add(new (room));
+        else throw new RepositoryException("Room with this id already exists.");
     }
 
     /// <summary>
@@ -33,7 +35,8 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     /// <exception cref="InvalidArgumentException">if the room with this id does not exist.</exception>
     public async Task RemoveAsync(string id)
     {
-        _repository.RemoveAll(r => r.Id == id);
+        if (_repository.RemoveAll(r => r.Id == id) == 0) 
+            throw new RepositoryException("Room with this id does not exist.");
     }
 
     /// <summary>
@@ -55,11 +58,11 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     /// Updates room data.
     /// </summary>
     /// <param name="room">Updated room data.</param>
-    /// <exception cref="InvalidOperationException">if booking with this id does not exist.</exception>
+    /// <exception cref="RepositoryException">if booking with this id does not exist.</exception>
     public async Task UpdateAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
-            throw new InvalidOperationException("Room with this id does not exist.");
+            throw new RepositoryException("Room with this id does not exist.");
         
         _repository[_repository.FindIndex(r => r.Id == room.Id)] = room;
     }

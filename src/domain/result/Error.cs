@@ -8,7 +8,7 @@ namespace ABP.Domain.Result;
 /// </remarks>
 /// <param name="title">A title of an error.</param>
 /// <param name="problems">A dictionary of problems.</param>
-public class Error(string title, IDictionary<string, string[]>? problems)
+public class Error(string title, IDictionary<string, string[]>? problems = null)
 {
     
     /// <summary>

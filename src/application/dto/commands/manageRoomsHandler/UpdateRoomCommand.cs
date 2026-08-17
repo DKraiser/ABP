@@ -6,8 +6,8 @@ public record UpdateRoomCommand(
     string Id, 
     string? NewName = null, 
     int NewCapacity = 0, 
-    decimal NewBasePrice = -1, 
+    decimal NewBasePrice = 0, 
     List<Service>? NewServices = null,
     List<Service>? UpdatedServices = null,
-    List<Service>? DeletedServices = null
+    List<Service>? RemovedServices = null
 );

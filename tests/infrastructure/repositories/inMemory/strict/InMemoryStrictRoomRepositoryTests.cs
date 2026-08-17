@@ -1,6 +1,7 @@
 using NUnit;
 using ABP.Domain.Entities;
 using ABP.Infrastructure.Repositories.InMemory.Strict;
+using ABP.Application.Exceptions;
 
 namespace ABP.Tests.Infrastructure.Repositories.InMemory.Strict;
 
@@ -43,12 +44,8 @@ public class InMemoryStrictRoomRepositoryTests {
 
     [Test]
     public async Task AddRoom_Duplicate() { 
-        var oldCount = (await repository.GetAllAsync()).ToList().Count;
         var duplicate = new Room(room);
-        await repository.AddAsync(duplicate);
-        var newCount = (await repository.GetAllAsync()).ToList().Count;
-
-        Assert.That(oldCount, Is.EqualTo(newCount));
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.AddAsync(duplicate));
     }
 
     [Test]
@@ -65,11 +62,7 @@ public class InMemoryStrictRoomRepositoryTests {
 
     [Test]
     public async Task RemoveRoom_NotExisting() {
-        var oldCount = (await repository.GetAllAsync()).ToList().Count;
-        await repository.RemoveAsync("Some string id");
-        var newCount = (await repository.GetAllAsync()).ToList().Count;
-
-        Assert.That(oldCount, Is.EqualTo(newCount));
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.RemoveAsync("Some string id"));
     }
 
     [Test]
@@ -77,7 +70,7 @@ public class InMemoryStrictRoomRepositoryTests {
         var updatedRoom = await repository.FindByIdAsync(room.Id);
 
         updatedRoom?.BasePrice = 3000;
-        updatedRoom?.AvailableServices.Add(new Service ("Internet", 500));
+        updatedRoom?.AddService(new Service ("Internet", 500));
 
         await repository.UpdateAsync(updatedRoom);
 
@@ -95,7 +88,7 @@ public class InMemoryStrictRoomRepositoryTests {
     public async Task UpdateRoom_NotExisting() {
         var service = new Service ("Internet", 500);
         var newRoom = new Room ("B", 100, 3000, [ service ]);
-        Assert.That(async () => await repository.UpdateAsync(newRoom), Throws.InvalidOperationException);
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.UpdateAsync(newRoom));
     }
 
     [Test]

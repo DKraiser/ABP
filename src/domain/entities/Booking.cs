@@ -1,3 +1,5 @@
+using ABP.Domain.Exceptions;
+
 namespace ABP.Domain.Entities;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class Booking : IEquatable<Booking> {
         get => _room;
         set {
             if (value is null)
-                throw new ArgumentException("Room must be not null.");
+                throw new DomainRulesViolationException("Room must be not null.");
             _room = value;
         }
     }
@@ -37,7 +39,7 @@ public class Booking : IEquatable<Booking> {
         get => _startTime;
         set { 
             if (value >= _endTime)
-                throw new ArgumentException("Start time must be lower than end time.");
+                throw new DomainRulesViolationException("Start time must be lower than end time.");
             _startTime = value;
         }
     }
@@ -50,7 +52,7 @@ public class Booking : IEquatable<Booking> {
         get => _endTime;
         set { 
             if (value <= _startTime)
-                throw new ArgumentException("End time must be greater than start time.");
+                throw new DomainRulesViolationException("End time must be greater than start time.");
             _endTime = value;            
         }
     }
@@ -64,9 +66,10 @@ public class Booking : IEquatable<Booking> {
     /// <param name="startTime">Booking start time.</param>
     /// <param name="endTime">Booking end time.</param>
     public Booking (Room room, DateTime startTime, DateTime endTime, IEnumerable<Service> requestedServices) { 
-        ArgumentNullException.ThrowIfNull(room);
+        if (room is null)
+            throw new DomainRulesViolationException("Room cannot be null");
         if (startTime >= endTime)
-            throw new ArgumentException("Booking period duration must be positive");
+            throw new DomainRulesViolationException("Booking period duration must be positive");
 
         _id = Guid.NewGuid().ToString();
         _room = room;
@@ -122,5 +125,5 @@ public class Booking : IEquatable<Booking> {
     }
 
     public override int GetHashCode() => 
-        HashCode.Combine(_id, _room, _startTime);
+        HashCode.Combine(Id);
 }

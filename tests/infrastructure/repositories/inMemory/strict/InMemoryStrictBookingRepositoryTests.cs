@@ -1,6 +1,7 @@
 using NUnit;
 using ABP.Domain.Entities;
 using ABP.Infrastructure.Repositories.InMemory.Strict;
+using ABP.Application.Exceptions;
 
 namespace ABP.Tests.Infrastructure.Repositories.InMemory.Strict;
 
@@ -45,7 +46,7 @@ public class InMemoryStrictBookingRepositoryTests {
     [Test]
     public async Task AddBooking_Duplicate() { 
         var duplicate = new Booking(booking);
-        Assert.That(async () => await repository.AddAsync(duplicate), Throws.InvalidOperationException);
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.AddAsync(duplicate));
     }
 
     [Test]
@@ -62,7 +63,7 @@ public class InMemoryStrictBookingRepositoryTests {
 
     [Test]
     public async Task RemoveBooking_NotExisting() {
-        Assert.That(async () => await repository.RemoveAsync("Some string id"), Throws.InvalidOperationException);
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.RemoveAsync("Some string id"));
     }
 
     [Test]
@@ -86,7 +87,7 @@ public class InMemoryStrictBookingRepositoryTests {
     [Test]
     public async Task UpdateBooking_NotExisting() {
         var newBooking = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
-        Assert.That(async () => await repository.UpdateAsync(newBooking), Throws.InvalidOperationException);
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.UpdateAsync(newBooking));
     }
 
     [Test]

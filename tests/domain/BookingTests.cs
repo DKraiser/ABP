@@ -2,6 +2,7 @@ using System.Dynamic;
 using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
 using ABP.Domain.Entities;
+using ABP.Domain.Exceptions;
 using NUnit;
 
 namespace ABP.Tests.Domain;
@@ -36,7 +37,7 @@ public class BookingTests {
 
     [Test]
     public void SetRoom_Invalid() {
-        Assert.That(() => booking.Room = null, Throws.ArgumentException);    
+        Assert.Throws<DomainRulesViolationException>(() => booking.Room = null);    
     }
 
     [Test]
@@ -52,7 +53,7 @@ public class BookingTests {
 
     [Test]
     public void SetStartTime_Invalid() { 
-        Assert.That(() => booking.StartTime = new DateTime(2000, 1, 1, 13, 0, 0), Throws.ArgumentException);
+        Assert.Throws<DomainRulesViolationException>(() => booking.StartTime = new DateTime(2000, 1, 1, 13, 0, 0));
     }
 
     [Test]
@@ -68,7 +69,7 @@ public class BookingTests {
 
     [Test]
     public void SetEndTime_Invalid() { 
-        Assert.That(() => booking.EndTime = new DateTime(2000, 1, 1, 7, 0, 0), Throws.ArgumentException);
+        Assert.Throws<DomainRulesViolationException>(() => booking.EndTime = new DateTime(2000, 1, 1, 7, 0, 0));
     }
 
     [Test]
