@@ -43,7 +43,12 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(o => {
+        o.Metadata = new Dictionary<string, string>(){
+            { "Title", "Booking API" },
+            { "Description", "Test task for ABP job application." },
+        };
+    });
 }
 
 if (app.Environment.IsProduction()) {
