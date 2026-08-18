@@ -45,7 +45,7 @@ public class BookRoomsHandler(
         var services = new List<Service>();
         var notExistingServices = new List<String>();
 
-        foreach (var id in command.RequestedServiceIds)
+        foreach (var id in command.RequestedServiceIds ?? [])
         {
             var service = room.AvailableServices
                 .FirstOrDefault(s => s.Id == id);

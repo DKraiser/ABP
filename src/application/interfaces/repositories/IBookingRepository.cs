@@ -9,8 +9,9 @@ namespace ABP.Application.Interfaces.Repositories;
 public interface IBookingRepository { 
     public Task AddAsync(Booking room);
     public Task UpdateAsync(Booking room);
-    public Task RemoveAsync(string id);
+    public Task DeleteAsync(string id);
     public Task<Booking?> FindByIdAsync(string id);
-    public Task<IReadOnlyCollection<Booking>> FindByDateTimeAsync(DateTime from, DateTime to);
+    public Task<IReadOnlyCollection<Booking>> FindByDateTimeStrictlyInAsync(DateTime from, DateTime to);
+    public Task<IReadOnlyCollection<Booking>> FindByDateTimeOverlappingAsync(DateTime from, DateTime to);
     public Task<IReadOnlyCollection<Booking>> GetAllAsync();
 }

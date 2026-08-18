@@ -32,7 +32,7 @@ public class InMemorySoftBookingRepository : IBookingRepository {
     /// If the booking with this id does not exist, operation is ignored. 
     /// </remarks>
     /// <param name="booking">Id of booking to be removed.</param>
-    public async Task RemoveAsync(string id)
+    public async Task DeleteAsync(string id)
     {
         _repository.RemoveAll(b => b.Id == id);
     }
@@ -53,15 +53,27 @@ public class InMemorySoftBookingRepository : IBookingRepository {
     }
 
     /// <summary>
-    /// Finds booking in repository by id.
+    /// Finds booking in repository by period which completely contains one. 
     /// </summary>
     /// <remarks>
     /// Duplicate of the booking is returned. 
     /// </remarks>
     /// <param name="from">Lower limit of search.</param>
     /// <param name="to">Upper limit of search.</param>
-    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeAsync(DateTime from, DateTime to) {
+    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeStrictlyInAsync(DateTime from, DateTime to) {
         return _repository.FindAll(b => b.StartTime >= from && b.EndTime <= to);
+    }
+
+    /// <summary>
+    /// Finds booking in repository by period that overlaps booking.
+    /// </summary>
+    /// <remarks>
+    /// Duplicate of the booking is returned. 
+    /// </remarks>
+    /// <param name="from">Lower limit of search.</param>
+    /// <param name="to">Upper limit of search.</param>
+    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeOverlappingAsync(DateTime from, DateTime to) {
+        return _repository.FindAll(b => b.StartTime <= from && b.EndTime > from || b.StartTime < to && b.EndTime >= to);
     }
 
     /// <summary>

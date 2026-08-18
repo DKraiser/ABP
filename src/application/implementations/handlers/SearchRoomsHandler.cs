@@ -1,4 +1,5 @@
 using ABP.Application.Dto.Commands.SearchRoomsHandler;
+using ABP.Application.Dto.Errors;
 using ABP.Application.Dto.Infos;
 using ABP.Application.Interfaces.Handlers;
 using ABP.Application.Interfaces.Repositories;
@@ -11,10 +12,20 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
     private readonly IBookingRepository _bookingRepository = bookingRepository;
     private readonly IRoomRepository _roomRepository = roomRepository;
 
-    public async Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync(SearchRoomsCommand command)
+    public async Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync(SearchSpareRoomsCommand command)
     {
         var from = command.Date.ToDateTime(command.StartTime);
         var to = command.Date.ToDateTime(command.EndTime);
+
+        if (from >= to) { 
+            return Result<IReadOnlyList<RoomInfo>>.Failure(
+                new DomainRulesViolationError(
+                    new Dictionary<string, string[]>() { 
+                        ["Booking period"] = ["Booking period length must be positive"]
+                    }
+                )
+            );
+        }
 
         // Get all rooms that satisfy the capacity requirement.
         var suitableRooms = (await _roomRepository.GetAllAsync())
@@ -22,7 +33,7 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
             .ToList();
 
         // Get bookings overlapping the requested period.
-        var bookings = await _bookingRepository.FindByDateTimeAsync(from, to);
+        var bookings = await _bookingRepository.FindByDateTimeOverlappingAsync(from, to);
 
         // IDs of rooms that are already booked.
         var bookedRoomIds = bookings

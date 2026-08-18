@@ -225,13 +225,15 @@ bookingsGroup.MapGet("/spare", async (
     [FromQuery] int minimalCapacity,
     [FromServices] ISearchRoomsHandler handler) => 
 {
-    var request = new SearchSpareRoomsRequest(date, startTime, endTime, minimalCapacity);
     var result = await handler.SearchRoomsAsync(
-        new SearchSpareRoomsCommand(request.Date, request.StartTime, request.EndTime, request.MinimalCapacity)
+        new SearchSpareRoomsCommand(date, startTime, endTime, minimalCapacity)
     );
 
     if (!result.IsSuccessful) 
-        return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+        if (result.Error is DomainRulesViolationError)
+            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
+
+        else return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
     
     if (!result.Value!.Any())
         return Results.NoContent();
@@ -241,10 +243,8 @@ bookingsGroup.MapGet("/spare", async (
 .WithName("Search spare rooms")
 .WithSummary("Searches spare rooms matching request criteria.")
 .WithDescription("Returns list of room info objects representing all " +
-    "rooms that are spare and match request criteria." +
-    "Should not fail."
+    "rooms that are spare and match request criteria."
 )
-.Accepts<SearchSpareRoomsRequest>("application/json")
 .Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json")
 .Produces(StatusCodes.Status204NoContent);
 

@@ -35,12 +35,12 @@ public class SearchRoomsHandlerTests
             .ReturnsAsync([smallRoom, largeRoom]);
 
         _bookingRepository
-            .Setup(r => r.FindByDateTimeAsync(
+            .Setup(r => r.FindByDateTimeStrictlyInAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchSpareRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -72,12 +72,12 @@ public class SearchRoomsHandlerTests
             .ReturnsAsync([availableRoom, bookedRoom]);
 
         _bookingRepository
-            .Setup(r => r.FindByDateTimeAsync(
+            .Setup(r => r.FindByDateTimeStrictlyInAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchSpareRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -115,12 +115,12 @@ public class SearchRoomsHandlerTests
             .ReturnsAsync([room1, room2]);
 
         _bookingRepository
-            .Setup(r => r.FindByDateTimeAsync(
+            .Setup(r => r.FindByDateTimeStrictlyInAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking1, booking2]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchSpareRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -145,12 +145,12 @@ public class SearchRoomsHandlerTests
             .ReturnsAsync([room1, room2]);
 
         _bookingRepository
-            .Setup(r => r.FindByDateTimeAsync(
+            .Setup(r => r.FindByDateTimeStrictlyInAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchSpareRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -174,12 +174,12 @@ public class SearchRoomsHandlerTests
             .ReturnsAsync([room]);
 
         _bookingRepository
-            .Setup(r => r.FindByDateTimeAsync(
+            .Setup(r => r.FindByDateTimeStrictlyInAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchSpareRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -205,12 +205,12 @@ public class SearchRoomsHandlerTests
             .ReturnsAsync([room]);
 
         _bookingRepository
-            .Setup(r => r.FindByDateTimeAsync(
+            .Setup(r => r.FindByDateTimeStrictlyInAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchSpareRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),

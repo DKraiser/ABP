@@ -52,7 +52,7 @@ public class InMemoryStrictBookingRepositoryTests {
     [Test]
     public async Task RemoveBooking_Existing() {
         var oldCount = (await repository.GetAllAsync()).ToList().Count;
-        await repository.RemoveAsync(booking.Id);
+        await repository.DeleteAsync(booking.Id);
         var newCount = (await repository.GetAllAsync()).ToList().Count;
 
         Assert.Multiple(async () => {
@@ -63,7 +63,7 @@ public class InMemoryStrictBookingRepositoryTests {
 
     [Test]
     public async Task RemoveBooking_NotExisting() {
-        Assert.ThrowsAsync<RepositoryException>(async () => await repository.RemoveAsync("Some string id"));
+        Assert.ThrowsAsync<RepositoryException>(async () => await repository.DeleteAsync("Some string id"));
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class InMemoryStrictBookingRepositoryTests {
         await repository.AddAsync(booking3);
         await repository.AddAsync(booking4);
 
-        var relevant = (await repository.FindByDateTimeAsync
+        var relevant = (await repository.FindByDateTimeStrictlyInAsync
             (new DateTime(2000, 1, 1, 2, 0, 0), new DateTime(2000, 1, 1, 13, 30, 0))).ToList();
                 
         Assert.Multiple(() => {
