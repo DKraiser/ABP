@@ -121,7 +121,7 @@ roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoom
             return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
     }
 
-    return Results.Created<string>($"/rooms/{result.Value}", result.Value);
+    return Results.CreatedAtRoute<string>("Get a new room", new { id = result.Value }, result.Value);
 })
 .WithName("Create a new room")
 .WithSummary("Creates a new room with requested data.")
