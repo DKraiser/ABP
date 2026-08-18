@@ -92,10 +92,10 @@ public class Room : IEquatable<Room>{
     /// <summary>
     /// Removes the service.
     /// </summary>
-    /// <param name="service">Service to remove.</param>
+    /// <param name="id">Id of service to remove.</param>
     /// <exception cref="DomainRulesViolationException">if service with this id does not exist.</exception>
-    public void RemoveService(Service service) {
-        if (_availableServices.RemoveAll(s => s.Id == service.Id) is 0)
+    public void RemoveService(string id) {
+        if (_availableServices.RemoveAll(s => s.Id == id) is 0)
             throw new DomainRulesViolationException("Room already provides service with this id.");
     }
 
@@ -107,7 +107,7 @@ public class Room : IEquatable<Room>{
     /// <param name="basePrice">Price of the room.</param>
     /// <param name="services">List of services available for this room.</param>
     /// <exception cref="DomainRulesViolationException">if rooms capacity is lower than or equal to 0.</exception>
-    public Room (string name, int capacity, decimal basePrice, List<Service> services) {
+    public Room (string name, int capacity, decimal basePrice, IReadOnlyList<Service> services) {
         if (string.IsNullOrWhiteSpace(name)) 
             throw new DomainRulesViolationException("Name of the room cannot be null");
         
@@ -115,7 +115,8 @@ public class Room : IEquatable<Room>{
         _name = name;
         Capacity = capacity;
         BasePrice = basePrice;
-        services.ForEach(s => AddService(s));
+        foreach (var s in services)
+            AddService(s);
     }
 
     /// <summary>

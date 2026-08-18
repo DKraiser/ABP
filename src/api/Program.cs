@@ -1,12 +1,20 @@
 using ABP.Api.Extensions;
+using ABP.Api.Requests;
+
+using ABP.Application.Dto.Commands.ManageRoomsHandler;
+using ABP.Application.Dto.Errors;
 using ABP.Application.Dto.Infos;
 using ABP.Application.Implementations.Handlers;
 using ABP.Application.Implementations.Policies.Booking;
 using ABP.Application.Implementations.Policies.Pricing.HoursPolicy;
 using ABP.Application.Interfaces.Handlers;
 using ABP.Application.Interfaces.Repositories;
+
+using ABP.Domain.Entities;
+
 using ABP.Infrastructure.Repositories.InMemory.Strict;
-using Microsoft.Extensions.Logging.Configuration;
+
+using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,7 +54,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(o => {
         o.Metadata = new Dictionary<string, string>(){
             { "Title", "Booking API" },
-            { "Description", "Test task for ABP job application." },
+            { "Description", "Test task for ABP job application." }
         };
     });
 }
@@ -55,7 +63,30 @@ if (app.Environment.IsProduction()) {
     app.UseExceptionHandler();
 }
 
-app.MapGet("/rooms/list", async (IManageRoomsHandler handler) => { 
+var roomsGroup = app.MapGroup("/rooms");
+
+roomsGroup.MapGet("/{id}", async (string id, IManageRoomsHandler handler) => { 
+    var result = await handler.FindAsync(new FindRoomCommand(id));
+    if (!result.IsSuccessful) {
+        return Results.NotFound(
+            new ProblemDetails () {
+                Type = nameof(result.Error),
+                Title = "Room not found",
+                Status = StatusCodes.Status404NotFound,
+                Detail = "Room with requested id was not found."
+            }
+        );
+    }
+    
+    return Results.Ok<RoomInfo>(result.Value);
+})
+.WithName("Get room info")
+.WithSummary("Gets information about room with this id.")
+.WithDescription("Returns `RoomInfo` object if room with requested id exists.")
+.Produces<RoomInfo>(StatusCodes.Status200OK, "application/json")
+.Produces<ProblemDetails>(StatusCodes.Status404NotFound, "application/json");
+
+roomsGroup.MapGet("/", async (IManageRoomsHandler handler) => { 
     var result = await handler.ListAllRoomsAsync();
     if (result?.Value?.Count is 0)
         return Results.NoContent();
@@ -68,4 +99,118 @@ app.MapGet("/rooms/list", async (IManageRoomsHandler handler) => {
 .Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json")
 .Produces(StatusCodes.Status204NoContent);
 
+roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoomsHandler handler) => {
+    var result = await handler.CreateAsync(
+        new CreateRoomCommand(
+            request.Name,
+            request.Capacity,
+            request.BasePrice,
+            [.. request.AvailableServices.Select<ServiceRequestNoId, Service>(r => new Service(r.Name, r.Price))]
+        )
+    );
+
+    if (!result.IsSuccessful) {
+        if (result.Error is DomainRulesViolationError)
+            return Results.UnprocessableEntity(
+                new ProblemDetails() {
+                    Type = nameof(DomainRulesViolationError),
+                    Title = "Domain rules violation",
+                    Status = StatusCodes.Status422UnprocessableEntity,
+                    Detail = "Request violates domain rules."
+                }
+            );
+        else if (result.Error is ConflictError)
+            return Results.Conflict(
+                new ProblemDetails() {
+                    Type = nameof(ConflictError),
+                    Title = "Duplication error",
+                    Status = StatusCodes.Status409Conflict,
+                    Detail = "Room with this id already exists."
+                }
+            );
+    }
+
+    return Results.Created<string>($"/rooms/get/{result.Value}", result.Value);
+})
+.WithName("Create a new room")
+.WithSummary("Creates a new room with requested data.")
+.WithDescription("Creates and stores a new room with data provided in request." +
+    "If request was successful, new room's id is returned." +
+    "Fails if request violate business/domain rules or causes a conflict.")
+.Accepts<CreateRoomRequest>("application/json")
+.Produces<string>(StatusCodes.Status201Created)
+.Produces<ProblemDetails>(StatusCodes.Status409Conflict)
+.Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity);
+
+roomsGroup.MapPut("/{id}", async (string id, [FromBody] UpdateRoomRequest request, IManageRoomsHandler handler) => {
+    var result = await handler.UpdateAsync(
+        new UpdateRoomCommand(
+            id,
+            request.NewName,
+            request.NewCapacity,
+            request.NewBasePrice,
+            request.NewServices?.Select<ServiceRequestNoId, Service>(r => new Service(r.Name, r.Price)).ToList(),
+            request.UpdatedServices?.Select<ServiceRequestId, Service>(r => new Service(r.Id, r.Name, r.Price)).ToList(),
+            request.RemovedServices
+        ) 
+    );
+
+    if (!result.IsSuccessful) { 
+        if (result.Error is NotFoundError)
+            return Results.NotFound(
+                new ProblemDetails () {
+                    Type = nameof(result.Error),
+                    Title = "Room not found",
+                    Status = StatusCodes.Status404NotFound,
+                    Detail = "Room with requested id was not found."
+                }
+            );
+        else if (result.Error is DomainRulesViolationError)
+            return Results.UnprocessableEntity(
+                new ProblemDetails() {
+                    Type = nameof(DomainRulesViolationError),
+                    Title = "Domain rules violation",
+                    Status = StatusCodes.Status422UnprocessableEntity,
+                    Detail = "Request violates domain rules."
+                }
+            );
+        
+    }
+
+    return Results.Ok();
+})
+.WithName("Update room data")
+.WithSummary("Updates data of the requested room.")
+.WithDescription("Updates and stores the room with data provided in request." +
+    "If request was successful, Ok is returned." +
+    "Fails if request violate business/domain rules or room does not exist.")
+.Accepts<UpdateRoomRequest>("application/json")
+.Produces(StatusCodes.Status200OK)
+.Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+.Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity);
+
+roomsGroup.MapDelete("/{id}", async (string id, IManageRoomsHandler handler) => {
+    var result = await handler.DeleteAsync(new DeleteRoomCommand(id));
+    if (!result.IsSuccessful) {
+        if (result.Error is NotFoundError)
+            return Results.NotFound(
+                new ProblemDetails () {
+                    Type = nameof(result.Error),
+                    Title = "Room not found",
+                    Status = StatusCodes.Status404NotFound,
+                    Detail = "Room with requested id was not found."
+                }
+            );
+    }
+
+    return Results.Ok();
+})
+.WithName("Delete a room")
+.WithSummary("Deletes a room with the specified id.")
+.WithDescription("Deletes a room with the specified id." +
+    "If succeeds, returns Ok, else returns NotFound")
+.Produces(StatusCodes.Status200OK)
+.Produces<ProblemDetails>(StatusCodes.Status404NotFound);
+
+var bookingsGroup = app.MapGroup("/bookings");
 app.Run();

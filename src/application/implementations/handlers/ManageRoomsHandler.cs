@@ -14,6 +14,13 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
 {
     private readonly IRoomRepository _repository = repository; 
 
+    /// <summary>
+    /// Create and save a room.
+    /// </summary>
+    /// <param name="command">Data of room to create.</param>
+    /// <returns>`Result<string>.Success()` with `id` if created successfully.</returns>
+    /// <returns>`Result<string>.Failure(DomainRulesViolationError)` if room data violate domain rules.</returns>
+    /// <returns>`Result<string>.Failure(ConflictError)` if room already exists.</returns>
     public async Task<Result<string>> CreateAsync(CreateRoomCommand command)
     {       
         Room room;
@@ -42,6 +49,7 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
 
         // If repository fails to add due to duplication etc,
         // it is an infrastructure layer problem and throws `RepositoryException`.
+        // If `RepositoryException` was thrown, method should be debugged.  
         await _repository.AddAsync(room);
 
         // If all is ok, room id is returned.
@@ -96,9 +104,12 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
             if (command.NewBasePrice != 0)
                 updated.BasePrice = command.NewBasePrice;
 
-            command.NewServices?.ForEach(s => updated.AddService(s));
-            command.RemovedServices?.ForEach(s => updated.RemoveService(s));
-            command.UpdatedServices?.ForEach(s => updated.UpdateService(s));
+            foreach (var s in command.NewServices ?? [])
+                updated.AddService(s);
+            foreach (var s in command.UpdatedServices ?? [])
+                updated.UpdateService(s);
+            foreach (var id in command.RemovedServices ?? [])
+                updated.RemoveService(id);
         }
         catch (DomainRulesViolationException exception) {
             var domainProblems = new Dictionary<string, string[]>() {
@@ -116,7 +127,7 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
         return Result.Success();
     }
 
-    public async Task<Result> RemoveAsync(DeleteRoomCommand command)
+    public async Task<Result> DeleteAsync(DeleteRoomCommand command)
     {
         // If room to remove does not exist, return failure
         Room? removed = await _repository.FindByIdAsync(command.Id);

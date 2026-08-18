@@ -6,5 +6,5 @@ public record CreateRoomCommand(
     string Name = null!, 
     int Capacity = 0, 
     decimal BasePrice = 0, 
-    List<Service>? Services = null
+    IReadOnlyList<Service>? Services = null
 );
