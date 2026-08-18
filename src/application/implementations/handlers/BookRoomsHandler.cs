@@ -1,13 +1,13 @@
-using ABP.Application.Dto.Infos;
 using ABP.Application.Dto.Commands.BookRoomsHandler;
 using ABP.Application.Dto.Errors;
+using ABP.Application.Dto.Infos;
+using ABP.Application.Exceptions;
 using ABP.Application.Interfaces.Handlers;
 using ABP.Application.Interfaces.Policies;
 using ABP.Application.Interfaces.Repositories;
 using ABP.Domain.Entities;
-using ABP.Domain.Result;
 using ABP.Domain.Exceptions;
-using ABP.Application.Exceptions;
+using ABP.Domain.Result;
 
 namespace ABP.Application.Implementations.Handlers;
 
@@ -101,6 +101,16 @@ public class BookRoomsHandler(
                 return Result<BookingConfirmationInfo>.Failure(
                     new BusinessRulesViolationError(problems));
             }
+        }
+
+        // Check if booking does not conflict with other ones.
+        if ((await _bookingRepository.GetAllAsync()).Where(b => b.Overlaps(booking)).Any()) {
+            var problems = new Dictionary<string, string[]>
+            {
+                ["Booking"] = ["The booking overlaps an already existing one."]
+            };
+
+            return Result<BookingConfirmationInfo>.Failure(new ConflictError (problems));
         }
 
         // Calculate price.

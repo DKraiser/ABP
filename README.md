@@ -13,7 +13,7 @@ This project is a small test for job application to ABP company. In this project
 
 - .NET 10
 - OpenAPI documentation with Scalar for rendering
-- NUnit for unit testing
+- NUnit + Moq for unit testing
 
 ## Quick start
 
@@ -21,7 +21,7 @@ To run application:
 
 ```bash
 # To run use
-dotnet run src/api
+dotnet run --project src/api
 
 # To run all tests use
 dotnet test
@@ -33,8 +33,8 @@ API overview: `http://localhost:5225/scalar`
 
 ## To do (most to least valuable)
 
-- Usecases + tests
-- API
+- Check unit tests for `application` 
+- Implement `/booking` group in `api`
 - Documentation 
 - Configurations
 - Metrics

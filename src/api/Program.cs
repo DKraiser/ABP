@@ -91,7 +91,7 @@ roomsGroup.MapGet("/", async (IManageRoomsHandler handler) => {
     if (!result.IsSuccessful)
         return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
 
-    if (result.Value.Count is 0)
+    if (result.Value!.Count is 0)
         return Results.NoContent();
 
     return Results.Ok(result.Value);

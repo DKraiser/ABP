@@ -31,7 +31,7 @@ public static class RoomProblemDetailsFactory {
 
     public static ProblemDetails InternalServerError(Result result) =>
         new () {
-            Type = result.Error.GetType().Name,
+            Type = result.Error!.GetType().Name,
             Title = "Internal server error",
             Status = StatusCodes.Status500InternalServerError,
             Detail = "Unexpected server error occured."

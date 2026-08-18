@@ -1,5 +1,5 @@
 using ABP.Application.Dto.Infos;
-using ABP.Application.Dto.Commands.BookRoomsHandler;
+using ABP.Application.Dto.Commands.SearchRoomsHandler;
 using ABP.Domain.Entities;
 using ABP.Domain.Result;
 

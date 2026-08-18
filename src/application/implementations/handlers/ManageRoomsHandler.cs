@@ -56,6 +56,12 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
         return Result<string>.Success(room.Id);
     }
 
+    /// <summary>
+    /// Finds a room with the specified id.
+    /// </summary>
+    /// <param name="command">Command with the id.</param>
+    /// <returns>`Result<string>.Success()` with `RoomInfo` if found.</returns>
+    /// <returns>`Result<string>.Failure(NotFoundError)` if room with this id does not exist.</returns>
     public async Task<Result<RoomInfo>> FindAsync(FindRoomCommand command)
     {
         Room? foundRoom = await _repository.FindByIdAsync(command.Id);
@@ -72,6 +78,10 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
             new (foundRoom.Id, foundRoom.Name, foundRoom.Capacity, foundRoom.BasePrice, foundRoom.AvailableServices));
     }
 
+    /// <summary>
+    /// Returns a collection of all rooms info.
+    /// </summary>
+    /// <returns>`Result<string>.Success()` with `IReadOnlyList<RoomInfo>`.</returns>
     public async Task<Result<IReadOnlyList<RoomInfo>>> ListAllRoomsAsync()
     {
         List<RoomInfo> roomInfos = [];
@@ -82,6 +92,13 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
         return Result<IReadOnlyList<RoomInfo>>.Success(roomInfos);
     }
 
+    /// <summary>
+    /// Updates the room with the specified id.
+    /// </summary>
+    /// <param name="command">Command with the new data of room.</param>
+    /// <returns>`Result<string>.Success()` if succeeded.</returns>
+    /// <returns>`Result<string>.Failure(NotFoundError)` if room with this id does not exist.</returns>
+    /// <returns>`Result<string>.Failure(DomainRulesViolationError)` if room data violate domain rules.</returns>
     public async Task<Result> UpdateAsync(UpdateRoomCommand command)
     {
         // If room to update does not exist, return failure
@@ -92,7 +109,7 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
                 ["Room"] = ["Room with this id does not exist."]
             };
 
-            return Result<RoomInfo>.Failure(new NotFoundError(notFoundProblems));
+            return Result.Failure(new NotFoundError(notFoundProblems));
         }
 
         // If some fields are on their default values - this setting should not be changed.
@@ -127,6 +144,12 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
         return Result.Success();
     }
 
+    /// <summary>
+    /// Updates the room with the specified id.
+    /// </summary>
+    /// <param name="command">Command with the new data of room.</param>
+    /// <returns>`Result<string>.Success()` if succeeded.</returns>
+    /// <returns>`Result<string>.Failure(NotFoundError)` if room with this id does not exist.</returns>
     public async Task<Result> DeleteAsync(DeleteRoomCommand command)
     {
         // If room to remove does not exist, return failure
@@ -137,7 +160,7 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
                 ["Room"] = ["Room with this id does not exist."]
             };
 
-            return Result<RoomInfo>.Failure(new NotFoundError(notFoundProblems));
+            return Result.Failure(new NotFoundError(notFoundProblems));
         }
 
         // If repository fails to remove the room because of some problems (invalid id),
