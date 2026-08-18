@@ -11,6 +11,6 @@ public interface IBookingRepository {
     public Task UpdateAsync(Booking room);
     public Task RemoveAsync(string id);
     public Task<Booking?> FindByIdAsync(string id);
-    public Task<IEnumerable<Booking>> FindByDateTimeAsync(DateTime from, DateTime to);
-    public Task<IEnumerable<Booking>> GetAllAsync();
+    public Task<IReadOnlyCollection<Booking>> FindByDateTimeAsync(DateTime from, DateTime to);
+    public Task<IReadOnlyCollection<Booking>> GetAllAsync();
 }

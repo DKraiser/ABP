@@ -10,18 +10,8 @@ namespace ABP.Application.Implementations.Policies.Pricing.HoursPolicy;
 /// If reserved period is covered by no price periods, it will not be accounted. 
 /// Such type of situations have to be controlled by <see>IBookingPolicy</see>.
 /// </remarks>
-
-// In this implementation price periods are hardcoded, 
-// but it can be changed if configurations are introduced.
-public class HoursPricePolicy : IPricingPolicy {
-    private readonly List<PricePeriod> _pricePeriods =
-    [
-        new (new (6, 0), new (9, 0), 0.9m),
-        new (new (9, 0), new (12, 0), 1.0m),
-        new (new (12, 0), new (14, 0), 1.15m),
-        new (new (14, 0), new (18, 0), 1.0m),
-        new (new (18, 0), new (23, 0), 0.8m)
-    ];
+public class HoursPricePolicy (IReadOnlyList<PricePeriod> pricePeriods) : IPricingPolicy {
+    private readonly IReadOnlyList<PricePeriod> _pricePeriods = pricePeriods;
 
     public decimal CalculatePrice(Domain.Entities.Booking booking)
     {

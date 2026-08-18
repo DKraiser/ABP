@@ -29,7 +29,7 @@ dotnet test
 dotnet test tests/[tested_layer]
 ```
 
-API overview: `http://localhost:8080/scalar`
+API overview: `http://localhost:5225/scalar`
 
 ## To do (most to least valuable)
 

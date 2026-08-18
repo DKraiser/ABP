@@ -12,7 +12,13 @@ public class HoursPricePolicyTests {
     [SetUp]
     public void SetUp()
     {
-        _calculator = new HoursPricePolicy();
+        _calculator = new HoursPricePolicy([
+            new (new (6, 0), new (9, 0), 0.9m),
+            new (new (9, 0), new (12, 0), 1.0m),
+            new (new (12, 0), new (14, 0), 1.15m),
+            new (new (14, 0), new (18, 0), 1.0m),
+            new (new (18, 0), new (23, 0), 0.8m)
+        ]);
 
         _room = new Room("A", 10, 100, []);
     }

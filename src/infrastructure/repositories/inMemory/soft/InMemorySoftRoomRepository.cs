@@ -67,7 +67,7 @@ public class InMemorySoftRoomRepository : IRoomRepository {
     /// Get all repository elements.
     /// </summary>
     /// <returns>Collection of repository elements.</returns>
-    public async Task<IEnumerable<Room>> GetAllAsync() { 
+    public async Task<IReadOnlyCollection<Room>> GetAllAsync() { 
         if (_repository.Count is 0) return [];
         var result = new List<Room>();
         result.AddRange(_repository.Select(r => new Room(r)));

@@ -60,7 +60,7 @@ public class InMemorySoftBookingRepository : IBookingRepository {
     /// </remarks>
     /// <param name="from">Lower limit of search.</param>
     /// <param name="to">Upper limit of search.</param>
-    public async Task<IEnumerable<Booking>> FindByDateTimeAsync(DateTime from, DateTime to) {
+    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeAsync(DateTime from, DateTime to) {
         return _repository.FindAll(b => b.StartTime >= from && b.EndTime <= to);
     }
 
@@ -79,7 +79,7 @@ public class InMemorySoftBookingRepository : IBookingRepository {
     /// Get all repository elements.
     /// </summary>
     /// <returns>Collection of repository elements.</returns>
-    public async Task<IEnumerable<Booking>> GetAllAsync() { 
+    public async Task<IReadOnlyCollection<Booking>> GetAllAsync() { 
         if (_repository.Count is 0) return [];
         var result = new List<Booking>();
         result.AddRange(_repository.Select(b => new Booking(b)));
