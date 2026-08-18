@@ -1,0 +1,124 @@
+using ABP.Application.Dto.Infos;
+using ABP.Application.Dto.Commands.BookRoomsHandler;
+using ABP.Application.Dto.Errors;
+using ABP.Application.Interfaces.Handlers;
+using ABP.Application.Interfaces.Policies;
+using ABP.Application.Interfaces.Repositories;
+using ABP.Domain.Entities;
+using ABP.Domain.Result;
+using ABP.Domain.Exceptions;
+using ABP.Application.Exceptions;
+
+namespace ABP.Application.Implementations.Handlers;
+
+public class BookRoomsHandler(
+    IBookingRepository bookingRepository, 
+    IRoomRepository roomRepository, 
+    IReadOnlyList<IBookingPolicy> bookingPolicies,
+    IReadOnlyList<IPricingPolicy> pricingPolicies
+) : IBookRoomsHandler
+{
+    private readonly IBookingRepository _bookingRepository = bookingRepository;
+    private readonly IRoomRepository _roomRepository = roomRepository;
+    private readonly IReadOnlyList<IBookingPolicy> _bookingPolicies = bookingPolicies;
+    private readonly IReadOnlyList<IPricingPolicy> _pricingPolicies = pricingPolicies;
+    
+    public async Task<Result<BookingConfirmationInfo>> BookRoomAsync(
+        BookRoomCommand command)
+    {
+        // Check if requested room exists.
+        var room = await _roomRepository.FindByIdAsync(command.RoomId);
+
+        if (room is null) {
+            // If room was not found, return a failure.
+            var notFoundProblems = new Dictionary<string, string[]> {
+                ["Room"] = ["Room with this id does not exist."]
+            };
+
+            return Result<BookingConfirmationInfo>.Failure(new NotFoundError(notFoundProblems));
+        }
+
+        var startTime = command.Date.ToDateTime(command.StartTime);
+        var endTime = command.Date.ToDateTime(command.EndTime);
+
+        // Check if all requested services exist.
+        var services = new List<Service>();
+        var notExistingServices = new List<String>();
+
+        foreach (var id in command.RequestedServiceIds)
+        {
+            var service = room.AvailableServices
+                .FirstOrDefault(s => s.Id == id);
+
+            if (service is null)         
+            {   
+                notExistingServices.Add($"Service '{id}' is not available in this room.");
+                continue;
+            }
+
+            services.Add(service);
+        }
+
+        // If some of requested services were not found, 
+        // return the corresponding error.
+        if (notExistingServices.Count is not 0) {
+            var problems = new Dictionary<string, string[]> {
+                ["Service"] = [.. notExistingServices]
+            };
+
+            return Result<BookingConfirmationInfo>.Failure(
+                new NotFoundError(problems));
+        }
+
+        // Create booking if reqeust does not violate domain rules. 
+        Booking booking;
+
+        try
+        {
+            booking = new Booking(room, startTime, endTime, services);
+        }
+        catch (DomainRulesViolationException exception)
+        {
+            var problems = new Dictionary<string, string[]>
+            {
+                ["Booking"] = [$"Failed to create a booking. {exception.Message}"]
+            };
+
+            return Result<BookingConfirmationInfo>.Failure(
+                new DomainRulesViolationError(problems));
+        }
+
+        // Check booking policies
+        foreach (var policy in _bookingPolicies)
+        {
+            if (!policy.IsAllowed(booking))
+            {
+                var problems = new Dictionary<string, string[]>
+                {
+                    ["Booking"] = ["The booking is not allowed."]
+                };
+
+                return Result<BookingConfirmationInfo>.Failure(
+                    new BusinessRulesViolationError(problems));
+            }
+        }
+
+        // Calculate price.
+        decimal price = 0;
+
+        foreach (var policy in _pricingPolicies)
+            price += policy.CalculatePrice(booking);
+
+        // Store booking.
+        await _bookingRepository.AddAsync(booking);
+
+        // If all is ok, return confirmation.
+        return Result<BookingConfirmationInfo>.Success(
+            new BookingConfirmationInfo(
+                booking.Id,
+                price,
+                command.Date,
+                command.StartTime,
+                command.EndTime));
+    }
+}

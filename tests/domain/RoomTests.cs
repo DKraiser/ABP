@@ -6,97 +6,97 @@ namespace ABP.Tests.Domain;
 
 [TestFixture]
 public class RoomTests { 
-    Room room;
-    Service service;
+    private Room _room = null!;
+    private Service _service  = null!;
 
     [SetUp]
     public void SetUp() { 
-        service = new Service("WiFi", 300);
+        _service = new Service("WiFi", 300);
 
-        List<Service> services = [ service ]; 
-        room = new Room("A", 50, 2000, services);
+        List<Service> services = [ _service ]; 
+        _room = new Room("A", 50, 2000, services);
     }   
 
     [Test]
     public void GetName() {
-        Assert.That(room.Name, Is.EqualTo("A"));
+        Assert.That(_room.Name, Is.EqualTo("A"));
     }
 
     [Test]
     public void SetName_Valid() { 
-        room.Name = "B";
-        Assert.That(room.Name, Is.EqualTo("B"));
+        _room.Name = "B";
+        Assert.That(_room.Name, Is.EqualTo("B"));
     }
 
     [Test]
     public void SetName_Invalid_Null() { 
-        Assert.Throws<DomainRulesViolationException>(() => room.Name = null);
+        Assert.Throws<DomainRulesViolationException>(() => _room.Name = null);
     }
 
     [Test]
     public void SetName_Invalid_Empty() { 
-        Assert.Throws<DomainRulesViolationException>(() => room.Name = string.Empty);
+        Assert.Throws<DomainRulesViolationException>(() => _room.Name = string.Empty);
     }
 
     [Test]
     public void SetName_Invalid_Whitespace() { 
-        Assert.Throws<DomainRulesViolationException>(() => room.Name = " ");
+        Assert.Throws<DomainRulesViolationException>(() => _room.Name = " ");
     }
 
     [Test]
     public void GetCapacity() {
-        Assert.That(room.Capacity, Is.EqualTo(50));
+        Assert.That(_room.Capacity, Is.EqualTo(50));
     }
 
     [Test]
     public void SetCapacity_Valid() {
-        room.Capacity = 10;
-        Assert.That(room.Capacity, Is.EqualTo(10));
+        _room.Capacity = 10;
+        Assert.That(_room.Capacity, Is.EqualTo(10));
     }
 
     [Test]
     public void SetCapacity_Invalid() {
-        Assert.Throws<DomainRulesViolationException>(() => room.Capacity = 0);
+        Assert.Throws<DomainRulesViolationException>(() => _room.Capacity = 0);
     }
 
     [Test]
     public void GetBasePrice() {
-        Assert.That(room.BasePrice, Is.EqualTo(2000));
+        Assert.That(_room.BasePrice, Is.EqualTo(2000));
     }
 
     [Test]
     public void SetBasePrice_Valid() {
-        room.BasePrice = 10.1m;
-        Assert.That(room.BasePrice, Is.EqualTo(10.1m));
+        _room.BasePrice = 10.1m;
+        Assert.That(_room.BasePrice, Is.EqualTo(10.1m));
     }
 
     [Test]
     public void SetBasePrice_Invalid() {
-        Assert.Throws<DomainRulesViolationException>(() => room.BasePrice = 0);
+        Assert.Throws<DomainRulesViolationException>(() => _room.BasePrice = 0);
     }
 
     [Test]
     public void GetServices() {
-        Assert.That(room.AvailableServices, Has.Count.EqualTo(1));
-        Assert.That(room.AvailableServices[0], Is.EqualTo(service));
+        Assert.That(_room.AvailableServices, Has.Count.EqualTo(1));
+        Assert.That(_room.AvailableServices[0], Is.EqualTo(_service));
     }
 
     [Test]
     public void Equals_True_Same() {
-        var addressCopy = room;
-        Assert.That(addressCopy, Is.EqualTo(room));
-        Assert.That(() => addressCopy == room, Is.True);
+        var addressCopy = _room;
+        Assert.That(addressCopy, Is.EqualTo(_room));
+        Assert.That(() => addressCopy == _room, Is.True);
     }
 
     [Test]
     public void Equals_True_Copy() {
-        var copy = new Room(room);
-        Assert.That(copy, Is.EqualTo(room));
-        Assert.That(() => copy == room, Is.False);
+        var copy = new Room(_room);
+        Assert.That(copy, Is.EqualTo(_room));
+        Assert.That(() => copy == _room, Is.False);
     }
 
     [Test]
     public void GetHashCode_DoesNotThrow() {
-        Assert.DoesNotThrow(() => room.GetHashCode());
+        Assert.DoesNotThrow(() => _room.GetHashCode());
     }
 }

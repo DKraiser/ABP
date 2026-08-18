@@ -6,8 +6,8 @@ using ABP.Domain.Result;
 namespace ABP.Application.Interfaces.Handlers;
 
 /// <summary>
-/// Searching and booking rooms handler. 
+/// Search rooms handler. 
 /// </summary>
-public interface IBookRoomsHandler {
-    public Task<Result<BookingConfirmationInfo>> BookRoomAsync(BookRoomCommand command);
+public interface ISearchRoomsHandler {
+    public Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync (SearchRoomsCommand command);
 }

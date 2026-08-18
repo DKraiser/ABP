@@ -11,5 +11,5 @@ public interface IRoomRepository {
     public Task UpdateAsync(Room room);
     public Task RemoveAsync(string id);
     public Task<Room?> FindByIdAsync(string id);
-    public Task<IEnumerable<Room>> GetAllAsync();
+    public Task<IReadOnlyCollection<Room>> GetAllAsync();
 }

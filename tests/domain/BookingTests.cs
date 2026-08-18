@@ -9,87 +9,87 @@ namespace ABP.Tests.Domain;
 
 [TestFixture]
 public class BookingTests { 
-    Service service;
-    Room room;
-    Room anotherRoom;
-    Booking booking;
+    private Service _service = null!;
+    private Room _room = null!;
+    private Room _anotherRoom = null!;
+    private Booking _booking = null!;
 
     [SetUp]
     public void SetUp() {
-        service = new Service("WiFi", 300);
-        room = new Room("A", 50, 2000, [ service ]);
-        anotherRoom = new Room("B", 100, 3000, []);
+        _service = new Service("WiFi", 300);
+        _room = new Room("A", 50, 2000, [ _service ]);
+        _anotherRoom = new Room("B", 100, 3000, []);
 
-        booking = new Booking(room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), [ service ]);
+        _booking = new Booking(_room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), [ _service ]);
     }
 
     [Test]
     public void GetRoom() {
-        Assert.That(booking.Room, Is.EqualTo(room));
+        Assert.That(_booking.Room, Is.EqualTo(_room));
     }
 
     [Test]
     public void SetRoom_Valid() {
         var room = new Room("B", 100, 3000, []);
-        booking.Room = room;
-        Assert.That(booking.Room, Is.EqualTo(room));
+        _booking.Room = room;
+        Assert.That(_booking.Room, Is.EqualTo(room));
     }
 
     [Test]
     public void SetRoom_Invalid() {
-        Assert.Throws<DomainRulesViolationException>(() => booking.Room = null);    
+        Assert.Throws<DomainRulesViolationException>(() => _booking.Room = null);    
     }
 
     [Test]
     public void GetStartTime() {
-        Assert.That(booking.StartTime, Is.EqualTo(new DateTime(2000, 1, 1, 8, 0, 0)));
+        Assert.That(_booking.StartTime, Is.EqualTo(new DateTime(2000, 1, 1, 8, 0, 0)));
     }
 
     [Test]
     public void SetStartTime_Valid() { 
-        booking.StartTime = new DateTime(2000, 1, 1, 9, 0, 0);
-        Assert.That(booking.StartTime, Is.EqualTo(new DateTime(2000, 1, 1, 9, 0, 0)));
+        _booking.StartTime = new DateTime(2000, 1, 1, 9, 0, 0);
+        Assert.That(_booking.StartTime, Is.EqualTo(new DateTime(2000, 1, 1, 9, 0, 0)));
     }
 
     [Test]
     public void SetStartTime_Invalid() { 
-        Assert.Throws<DomainRulesViolationException>(() => booking.StartTime = new DateTime(2000, 1, 1, 13, 0, 0));
+        Assert.Throws<DomainRulesViolationException>(() => _booking.StartTime = new DateTime(2000, 1, 1, 13, 0, 0));
     }
 
     [Test]
     public void GetEndTime() {
-        Assert.That(booking.EndTime, Is.EqualTo(new DateTime(2000, 1, 1, 12, 0, 0)));
+        Assert.That(_booking.EndTime, Is.EqualTo(new DateTime(2000, 1, 1, 12, 0, 0)));
     }
 
     [Test]
     public void SetEndTime_Valid() { 
-        booking.EndTime = new DateTime(2000, 1, 1, 13, 0, 0);
-        Assert.That(booking.EndTime, Is.EqualTo(new DateTime(2000, 1, 1, 13, 0, 0)));
+        _booking.EndTime = new DateTime(2000, 1, 1, 13, 0, 0);
+        Assert.That(_booking.EndTime, Is.EqualTo(new DateTime(2000, 1, 1, 13, 0, 0)));
     }
 
     [Test]
     public void SetEndTime_Invalid() { 
-        Assert.Throws<DomainRulesViolationException>(() => booking.EndTime = new DateTime(2000, 1, 1, 7, 0, 0));
+        Assert.Throws<DomainRulesViolationException>(() => _booking.EndTime = new DateTime(2000, 1, 1, 7, 0, 0));
     }
 
     [Test]
     public void GetRequestedServices() {
-        Assert.That(booking.RequestedServices, Has.Count.EqualTo(1));
-        Assert.That(booking.RequestedServices[0], Is.EqualTo(room.AvailableServices[0]));
+        Assert.That(_booking.RequestedServices, Has.Count.EqualTo(1));
+        Assert.That(_booking.RequestedServices[0], Is.EqualTo(_room.AvailableServices[0]));
     }
 
     [Test]
     public void Equals_True_Same() {
-        var addressCopy = booking;
-        Assert.That(addressCopy, Is.EqualTo(booking));
-        Assert.That(() => addressCopy == booking, Is.True);
+        var addressCopy = _booking;
+        Assert.That(addressCopy, Is.EqualTo(_booking));
+        Assert.That(() => addressCopy == _booking, Is.True);
     }
 
     [Test]
     public void Equals_True_Copy() {
-        var copy = new Booking(booking);
-        Assert.That(copy, Is.EqualTo(booking));
-        Assert.That(() => copy == booking, Is.False);
+        var copy = new Booking(_booking);
+        Assert.That(copy, Is.EqualTo(_booking));
+        Assert.That(() => copy == _booking, Is.False);
     }
 
     // |------A------|
@@ -99,8 +99,8 @@ public class BookingTests {
 
     [Test]
     public void Overlaps_False_DifferentRooms() {
-        var anotherBooking = new Booking(anotherRoom, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.False);
+        var anotherBooking = new Booking(_anotherRoom, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.False);
     }
 
     // |------A------|
@@ -109,8 +109,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_False_Another_IsLater() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 12, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.False);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 12, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.False);
     } 
 
     //               |------B------|
@@ -119,8 +119,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_False_Another_IsEarlier() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 3, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.False);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 3, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.False);
     }
 
     //           |------A------|
@@ -129,8 +129,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsFromLeft() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 10, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 10, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     // |------B------|
@@ -139,8 +139,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsFromRight() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 10, 0, 0), new DateTime(2000, 1, 1, 14, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 10, 0, 0), new DateTime(2000, 1, 1, 14, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //     |------A------|
@@ -149,8 +149,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsFromBothSides() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 14, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 14, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //     |------A------|
@@ -159,8 +159,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsInMiddle() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 10, 0, 0), new DateTime(2000, 1, 1, 11, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 10, 0, 0), new DateTime(2000, 1, 1, 11, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //     |------A------|
@@ -169,8 +169,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsExactly() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //     |------A------|
@@ -179,8 +179,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsLeftSegment() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //     |------A------|
@@ -189,8 +189,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_Another_OverlapsRightSegment() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 6, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 6, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //     |---A---|
@@ -199,8 +199,8 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_This_OverlapsLeftSegment() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 1, 1, 16, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 3, 0, 0), new DateTime(2000, 1, 1, 16, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     //           |---A---|
@@ -209,12 +209,12 @@ public class BookingTests {
     // ------------------------------> time
     [Test]
     public void Overlaps_True_This_OverlapsRightSegment() {
-        var anotherBooking = new Booking(room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
-        Assert.That(booking.Overlaps(anotherBooking), Is.True);
+        var anotherBooking = new Booking(_room, new DateTime(2000, 1, 1, 1, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
+        Assert.That(_booking.Overlaps(anotherBooking), Is.True);
     }
 
     [Test]
     public void GetHashCode_DoesNotThrow() {
-        Assert.DoesNotThrow(() => booking.GetHashCode());
+        Assert.DoesNotThrow(() => _booking.GetHashCode());
     }
 }

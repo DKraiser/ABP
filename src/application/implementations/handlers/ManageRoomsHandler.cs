@@ -6,7 +6,7 @@ using ABP.Domain.Entities;
 using ABP.Domain.Result;
 using ABP.Domain.Exceptions;
 using ABP.Application.Exceptions;
-using System.Runtime.InteropServices;
+using ABP.Application.Dto.Infos;
 
 namespace ABP.Application.Implementations.Handlers;
 
@@ -23,52 +23,69 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
             room = new (command.Name, command.Capacity, command.BasePrice, command.Services ?? []);
         } 
         catch (DomainRulesViolationException exception) {
-            Dictionary<string, string[]>? domainProblems = [];
-            domainProblems.Add("Failed to create the room.", [$"{exception.Message}"]);
+            var domainProblems = new Dictionary<string, string[]> {
+                ["Failed to create the room."] = [$"{exception.Message}"]
+            };
             
             return Result<string>.Failure(new DomainRulesViolationError(domainProblems));
         }
 
-        try {
-            // If repository fails to add due to duplication etc,
-            // it is an infrastructure layer problem and throws `RepositoryException`.
-            await _repository.AddAsync(room);
-        } 
-        catch (RepositoryException exception) {
-            Dictionary<string, string[]>? infrastructureProblems = [];
-            infrastructureProblems.Add("Failed to store the room.", [$"{exception.Message}"]);
-            
-            return Result<string>.Failure(new InfrastructureError(infrastructureProblems));
+        // If room with this id already exists, request create a conflict,
+        // and the corresponding failure is returned.
+        if (await _repository.FindByIdAsync(room.Id) is not null) {
+            var duplicateProblems = new Dictionary<string, string[]> {
+                ["Room"] = ["Room with this id already exists."]
+            };
+
+            return Result<string>.Failure(new ConflictError(duplicateProblems));
         }
+
+        // If repository fails to add due to duplication etc,
+        // it is an infrastructure layer problem and throws `RepositoryException`.
+        await _repository.AddAsync(room);
 
         // If all is ok, room id is returned.
         return Result<string>.Success(room.Id);
     }
 
-    public async Task<Result> RemoveAsync(DeleteRoomCommand command)
+    public async Task<Result<RoomInfo>> FindAsync(FindRoomCommand command)
     {
-        try {
-            // If repository fails to remove the room because of some problems (invalid id),
-            // it is an infrastructure layer problem and throws `RepositoryException`.
-            await _repository.RemoveAsync(command.Id);
-        } 
-        catch (RepositoryException exception) {
-            Dictionary<string, string[]>? infrastructureProblems = [];
-            infrastructureProblems.Add("Failed to remove the room.", [$"{exception.Message}"]);
-            
-            return Result.Failure(new InfrastructureError(infrastructureProblems));
-        }
+        Room? foundRoom = await _repository.FindByIdAsync(command.Id);
+        if (foundRoom is null) {
+            // If room was not found, return a failure.
+            var notFoundProblems = new Dictionary<string, string[]> {
+                ["Room"] = ["Room with this id does not exist."]
+            };
 
-        // If all is ok, success is returned.
-        return Result.Success();
+            return Result<RoomInfo>.Failure(new NotFoundError(notFoundProblems));
+        }
+        
+        return Result<RoomInfo>.Success(
+            new (foundRoom.Id, foundRoom.Name, foundRoom.Capacity, foundRoom.BasePrice, foundRoom.AvailableServices));
+    }
+
+    public async Task<Result<IReadOnlyList<RoomInfo>>> ListAllRoomsAsync()
+    {
+        List<RoomInfo> roomInfos = [];
+        var rooms = await _repository.GetAllAsync(); 
+        rooms.ToList().ForEach(r => roomInfos.Add(
+            new (r.Id, r.Name, r.Capacity, r.BasePrice, r.AvailableServices)
+        ));
+        return Result<IReadOnlyList<RoomInfo>>.Success(roomInfos);
     }
 
     public async Task<Result> UpdateAsync(UpdateRoomCommand command)
     {
         // If room to update does not exist, return failure
         Room? updated = await _repository.FindByIdAsync(command.Id);
-        if (updated is null) 
-            return Result.Failure(new NotFoundError());
+        if (updated is null) {
+            // If room was not found, return a failure.
+            var notFoundProblems = new Dictionary<string, string[]> {
+                ["Room"] = ["Room with this id does not exist."]
+            };
+
+            return Result<RoomInfo>.Failure(new NotFoundError(notFoundProblems));
+        }
 
         // If some fields are on their default values - this setting should not be changed.
         try {
@@ -84,23 +101,37 @@ public class ManageRoomsHandler (IRoomRepository repository) : IManageRoomsHandl
             command.UpdatedServices?.ForEach(s => updated.UpdateService(s));
         }
         catch (DomainRulesViolationException exception) {
-            Dictionary<string, string[]>? domainProblems = [];
-            domainProblems.Add("Failed to create the room.", [$"{exception.Message}"]);
-            
+            var domainProblems = new Dictionary<string, string[]>() {
+                ["Failed to update the room."] = [$"{exception.Message}"]
+            };
+
             return Result<string>.Failure(new DomainRulesViolationError(domainProblems));
         }
         
-        try {
-            // If repository fails to update the room because of some problems (invalid id),
-            // it is an infrastructure layer problem and throws `RepositoryException`.
-            await _repository.UpdateAsync(updated);
-        } 
-        catch (RepositoryException exception) {
-            Dictionary<string, string[]>? infrastructureProblems = [];
-            infrastructureProblems.Add("Failed to remove the room.", [$"{exception.Message}"]);
-            
-            return Result.Failure(new InfrastructureError(infrastructureProblems));
+        // If repository fails to update the room because of some problems (invalid id),
+        // it is an infrastructure layer problem and throws `RepositoryException`.
+        await _repository.UpdateAsync(updated);
+
+        // If all is ok, success is returned.
+        return Result.Success();
+    }
+
+    public async Task<Result> RemoveAsync(DeleteRoomCommand command)
+    {
+        // If room to remove does not exist, return failure
+        Room? removed = await _repository.FindByIdAsync(command.Id);
+        if (removed is null) {
+            // If room was not found, return a failure.
+            var notFoundProblems = new Dictionary<string, string[]> {
+                ["Room"] = ["Room with this id does not exist."]
+            };
+
+            return Result<RoomInfo>.Failure(new NotFoundError(notFoundProblems));
         }
+
+        // If repository fails to remove the room because of some problems (invalid id),
+        // it is an infrastructure layer problem and throws `RepositoryException`.
+        await _repository.RemoveAsync(command.Id);
 
         // If all is ok, success is returned.
         return Result.Success();
