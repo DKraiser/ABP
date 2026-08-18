@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ABP.Api.ProblemDetailz;
 
-public static class RoomProblemDetailsFactory {
+public static class ProblemDetailsFactory {
     public static ProblemDetails NotFound() =>
         new() {
             Type = nameof(NotFoundError),
-            Title = "Room not found",
+            Title = "Object not found",
             Status = StatusCodes.Status404NotFound,
-            Detail = "Room with requested id was not found."
+            Detail = "Object with requested id was not found."
         };
 
     public static ProblemDetails Conflict() =>
@@ -18,7 +18,7 @@ public static class RoomProblemDetailsFactory {
             Type = nameof(ConflictError),
             Title = "Duplication error",
             Status = StatusCodes.Status409Conflict,
-            Detail = "Room with this id already exists."
+            Detail = "Object with this id already exists."
         };
 
     public static ProblemDetails DomainRulesViolation() =>
@@ -27,6 +27,14 @@ public static class RoomProblemDetailsFactory {
             Title = "Domain rules violation",
             Status = StatusCodes.Status422UnprocessableEntity,
             Detail = "Request violates domain rules."
+        };
+
+    public static ProblemDetails BusinessRulesViolation() =>
+        new () {
+            Type = nameof(DomainRulesViolationError),
+            Title = "Business rules violation",
+            Status = StatusCodes.Status422UnprocessableEntity,
+            Detail = "Request violates business rules."
         };
 
     public static ProblemDetails InternalServerError(Result result) =>

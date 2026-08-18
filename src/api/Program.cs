@@ -1,7 +1,9 @@
 using ABP.Api.Extensions;
 using ABP.Api.ProblemDetailz;
 using ABP.Api.Requests;
+using ABP.Application.Dto.Commands.BookRoomsHandler;
 using ABP.Application.Dto.Commands.ManageRoomsHandler;
+using ABP.Application.Dto.Commands.SearchRoomsHandler;
 using ABP.Application.Dto.Errors;
 using ABP.Application.Dto.Infos;
 using ABP.Application.Implementations.Handlers;
@@ -64,6 +66,33 @@ if (app.Environment.IsProduction()) {
     app.UseExceptionHandler();
 }
 
+// ========== Seed ==========  
+
+await using (var scope = app.Services.CreateAsyncScope()) {
+    var handler = scope.ServiceProvider.GetRequiredService<IManageRoomsHandler>();
+    await handler.CreateAsync(new CreateRoomCommand(
+        "Room A", 50, 2000, [
+            new ("Projector", 500),
+            new ("WiFi", 300),
+            new ("Sound", 700)
+        ]
+    ));
+    await handler.CreateAsync(new CreateRoomCommand(
+        "Room B", 100, 3500, [
+            new ("Projector", 500),
+            new ("WiFi", 300),
+            new ("Sound", 700)
+        ]
+    ));
+    await handler.CreateAsync(new CreateRoomCommand(
+        "Room C", 30, 1500, [
+            new ("Projector", 500),
+            new ("WiFi", 300),
+            new ("Sound", 700)
+        ]
+    ));
+}
+
 // ========== Room management endpoints ==========  
 
 var roomsGroup = app.MapGroup("/rooms");
@@ -72,9 +101,9 @@ roomsGroup.MapGet("/{id}", async (string id, IManageRoomsHandler handler) => {
     var result = await handler.FindAsync(new FindRoomCommand(id));
     if (!result.IsSuccessful) {
         if (result.Error is NotFoundError)
-            return Results.NotFound(RoomProblemDetailsFactory.NotFound);
+            return Results.NotFound(ProblemDetailsFactory.NotFound());
         else 
-            return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
+            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
     }
     
     return Results.Ok<RoomInfo>(result.Value);
@@ -89,7 +118,7 @@ roomsGroup.MapGet("/", async (IManageRoomsHandler handler) => {
     var result = await handler.ListAllRoomsAsync();
 
     if (!result.IsSuccessful)
-        return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
+        return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
 
     if (result.Value!.Count is 0)
         return Results.NoContent();
@@ -114,14 +143,14 @@ roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoom
 
     if (!result.IsSuccessful) {
         if (result.Error is DomainRulesViolationError)
-            return Results.UnprocessableEntity(RoomProblemDetailsFactory.DomainRulesViolation);
+            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
         else if (result.Error is ConflictError)
-            return Results.Conflict(RoomProblemDetailsFactory.Conflict);
+            return Results.Conflict(ProblemDetailsFactory.Conflict());
         else 
-            return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
+            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
     }
 
-    return Results.CreatedAtRoute<string>("Get a new room", new { id = result.Value }, result.Value);
+    return Results.CreatedAtRoute<string>("Get room info", new { id = result.Value }, result.Value);
 })
 .WithName("Create a new room")
 .WithSummary("Creates a new room with requested data.")
@@ -148,11 +177,11 @@ roomsGroup.MapPut("/{id}", async (string id, [FromBody] UpdateRoomRequest reques
 
     if (!result.IsSuccessful) { 
         if (result.Error is NotFoundError)
-            return Results.NotFound(RoomProblemDetailsFactory.NotFound);
+            return Results.NotFound(ProblemDetailsFactory.NotFound());
         else if (result.Error is DomainRulesViolationError)
-            return Results.UnprocessableEntity(RoomProblemDetailsFactory.DomainRulesViolation);
+            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
         else 
-            return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
+            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
     }
 
     return Results.NoContent();
@@ -171,9 +200,9 @@ roomsGroup.MapDelete("/{id}", async (string id, IManageRoomsHandler handler) => 
     var result = await handler.DeleteAsync(new DeleteRoomCommand(id));
     if (!result.IsSuccessful) {
         if (result.Error is NotFoundError)
-            return Results.NotFound(RoomProblemDetailsFactory.NotFound);
+            return Results.NotFound(ProblemDetailsFactory.NotFound());
         else 
-            return Results.InternalServerError(RoomProblemDetailsFactory.InternalServerError);
+            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
     }
 
     return Results.NoContent();
@@ -188,5 +217,64 @@ roomsGroup.MapDelete("/{id}", async (string id, IManageRoomsHandler handler) => 
 // ========== Booking endpoints ==========  
 
 var bookingsGroup = app.MapGroup("/bookings");
+
+bookingsGroup.MapGet("/spare", async (
+    [FromQuery] DateOnly date,
+    [FromQuery] TimeOnly startTime,
+    [FromQuery] TimeOnly endTime,
+    [FromQuery] int minimalCapacity,
+    [FromServices] ISearchRoomsHandler handler) => 
+{
+    var request = new SearchSpareRoomsRequest(date, startTime, endTime, minimalCapacity);
+    var result = await handler.SearchRoomsAsync(
+        new SearchSpareRoomsCommand(request.Date, request.StartTime, request.EndTime, request.MinimalCapacity)
+    );
+
+    if (!result.IsSuccessful) 
+        return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+    
+    if (!result.Value!.Any())
+        return Results.NoContent();
+
+    return Results.Ok(result.Value);
+})
+.WithName("Search spare rooms")
+.WithSummary("Searches spare rooms matching request criteria.")
+.WithDescription("Returns list of room info objects representing all " +
+    "rooms that are spare and match request criteria." +
+    "Should not fail."
+)
+.Accepts<SearchSpareRoomsRequest>("application/json")
+.Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json")
+.Produces(StatusCodes.Status204NoContent);
+
+bookingsGroup.MapPost("/book", async ([FromBody] BookRoomRequest request, IBookRoomsHandler handler) => {
+    var result = await handler.BookRoomAsync(
+        new BookRoomCommand(request.RoomId, request.Date, request.StartTime, request.EndTime, request.RequestedServiceIds)
+    );
+
+    if (!result.IsSuccessful) { 
+        if (result.Error is NotFoundError)
+            return Results.NotFound(ProblemDetailsFactory.NotFound());
+        else if (result.Error is DomainRulesViolationError)
+            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
+        else if (result.Error is BusinessRulesViolationError)
+            return Results.UnprocessableEntity(ProblemDetailsFactory.BusinessRulesViolation());
+        else if (result.Error is ConflictError)
+            return Results.Conflict(ProblemDetailsFactory.Conflict());
+        else
+            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+    }
+
+    return Results.Ok(result.Value);
+})
+.WithName("Book the room")
+.WithSummary("Books the room with requested services")
+.WithDescription("Creates, validates and stores a new booking.")
+.Accepts<BookRoomRequest>("application/json")
+.Produces<BookingConfirmationInfo>(StatusCodes.Status200OK, "application/json")
+.Produces<ProblemDetails>(StatusCodes.Status404NotFound, "application/json")
+.Produces<ProblemDetails>(StatusCodes.Status409Conflict, "application/json")
+.Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity, "application/json");
 
 app.Run();

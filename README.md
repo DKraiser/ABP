@@ -34,7 +34,6 @@ API overview: `http://localhost:5225/scalar`
 ## To do (most to least valuable)
 
 - Check unit tests for `application` 
-- Implement `/booking` group in `api`
 - Documentation 
 - Configurations
 - Metrics
