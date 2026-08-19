@@ -33,7 +33,6 @@ API overview: `http://localhost:5225/scalar`
 
 ## To do (most to least valuable)
 
-- Check unit tests for `application` 
 - Documentation 
 - Configurations
 - Metrics

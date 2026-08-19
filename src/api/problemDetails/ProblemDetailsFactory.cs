@@ -16,9 +16,9 @@ public static class ProblemDetailsFactory {
     public static ProblemDetails Conflict() =>
         new () {
             Type = nameof(ConflictError),
-            Title = "Duplication error",
+            Title = "Object exists",
             Status = StatusCodes.Status409Conflict,
-            Detail = "Object with this id already exists."
+            Detail = "This object already exists."
         };
 
     public static ProblemDetails DomainRulesViolation() =>

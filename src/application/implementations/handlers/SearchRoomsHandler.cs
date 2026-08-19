@@ -12,7 +12,13 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
     private readonly IBookingRepository _bookingRepository = bookingRepository;
     private readonly IRoomRepository _roomRepository = roomRepository;
 
-    public async Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync(SearchSpareRoomsCommand command)
+    /// <summary>
+    /// Searches the spare room.
+    /// </summary>
+    /// <param name="command">Criteria room have to match.</param>
+    /// <returns>`Result<string>.Success()` with `id` if created successfully.</returns>
+    /// <returns>`Result<string>.Failure(DomainRulesViolationError)` if criteria violate domain rules.</returns>
+    public async Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync(SearchRoomsCommand command)
     {
         var from = command.Date.ToDateTime(command.StartTime);
         var to = command.Date.ToDateTime(command.EndTime);
@@ -22,6 +28,16 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
                 new DomainRulesViolationError(
                     new Dictionary<string, string[]>() { 
                         ["Booking period"] = ["Booking period length must be positive"]
+                    }
+                )
+            );
+        }
+
+        if (command.MinimalCapacity < 0) { 
+            return Result<IReadOnlyList<RoomInfo>>.Failure(
+                new DomainRulesViolationError(
+                    new Dictionary<string, string[]>() { 
+                        ["Minimal capacity"] = ["Minimal capacity must be greater than zero."]
                     }
                 )
             );

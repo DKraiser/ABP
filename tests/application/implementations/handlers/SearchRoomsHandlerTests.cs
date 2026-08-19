@@ -40,7 +40,7 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchSpareRoomsCommand(
+        var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -77,7 +77,7 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking]);
 
-        var command = new SearchSpareRoomsCommand(
+        var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -120,7 +120,7 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking1, booking2]);
 
-        var command = new SearchSpareRoomsCommand(
+        var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -150,7 +150,7 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchSpareRoomsCommand(
+        var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -179,7 +179,7 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchSpareRoomsCommand(
+        var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
@@ -210,7 +210,7 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchSpareRoomsCommand(
+        var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),

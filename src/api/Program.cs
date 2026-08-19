@@ -28,6 +28,7 @@ builder.Services.AddSingleton<IBookingRepository, InMemoryStrictBookingRepositor
 builder.Services.AddScoped<IManageRoomsHandler, ManageRoomsHandler>();
 builder.Services.AddScoped<ISearchRoomsHandler, SearchRoomsHandler>();
 builder.Services.AddScoped<IBookRoomsHandler, BookRoomsHandler>();
+builder.Services.AddScoped<IReportHandler, ReportHandler>();
 
 builder.Services.AddBookingPolicies([
     new ForbiddenPeriodPolicy(new (23, 0), new (6, 0))
@@ -226,7 +227,7 @@ bookingsGroup.MapGet("/spare", async (
     [FromServices] ISearchRoomsHandler handler) => 
 {
     var result = await handler.SearchRoomsAsync(
-        new SearchSpareRoomsCommand(date, startTime, endTime, minimalCapacity)
+        new SearchRoomsCommand(date, startTime, endTime, minimalCapacity)
     );
 
     if (!result.IsSuccessful) 
@@ -277,4 +278,12 @@ bookingsGroup.MapPost("/book", async ([FromBody] BookRoomRequest request, IBookR
 .Produces<ProblemDetails>(StatusCodes.Status409Conflict, "application/json")
 .Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity, "application/json");
 
+var reportsGroup = app.MapGroup("/reports");
+reportsGroup.MapGet("/utilization", async ([FromQuery] DateOnly from, [FromQuery] DateOnly to, IReportHandler handler) => {
+    return Results.Ok(await handler.GetRoomUtilizationsAsync(from, to));
+})
+.WithName("Room utilization")
+.WithSummary("Room usage over queried period")
+.WithDescription("Returns utilization report for all rooms registered right now.")
+.Produces<IReadOnlyList<RoomUtilizationInfo>>(StatusCodes.Status200OK, "application/json");
 app.Run();

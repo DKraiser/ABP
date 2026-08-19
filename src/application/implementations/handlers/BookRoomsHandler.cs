@@ -23,6 +23,15 @@ public class BookRoomsHandler(
     private readonly IReadOnlyList<IBookingPolicy> _bookingPolicies = bookingPolicies;
     private readonly IReadOnlyList<IPricingPolicy> _pricingPolicies = pricingPolicies;
     
+    /// <summary>
+    /// Books the room if booking does not violate anything.
+    /// </summary>
+    /// <param name="command">Data needed to create booking.</param>
+    /// <returns>`Result<string>.Success()` with `BookingConfirmationInfo` if created successfully.</returns>
+    /// <returns>`Result<string>.Failure(DomainRulesViolationError)` if data violate domain rules.</returns>
+    /// <returns>`Result<string>.Failure(BusinessRulesViolationError)` if booking is forbidden by some booking policies.</returns>
+    /// <returns>`Result<string>.Failure(NotFoundError)` if room or service with this id does not exist.</returns>
+    /// <returns>`Result<string>.Failure(ConflictError)` if booking on that time already exists.</returns>
     public async Task<Result<BookingConfirmationInfo>> BookRoomAsync(
         BookRoomCommand command)
     {
