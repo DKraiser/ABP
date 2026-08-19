@@ -31,6 +31,8 @@ dotnet test tests/[tested_layer]
 
 API overview: `http://localhost:5225/scalar`
 
+Documentation file: [click here](docs/documentation.md)
+
 ## To do (most to least valuable)
 
 - Documentation 
