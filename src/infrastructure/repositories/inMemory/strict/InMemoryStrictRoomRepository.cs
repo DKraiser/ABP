@@ -10,7 +10,8 @@ namespace ABP.Infrastructure.Repositories.InMemory.Strict;
 /// <remarks>
 /// Soft means that if entry with this id already exists (for add/update) or missing (for remove), operation throws an exception.
 /// </remarks>
-public class InMemoryStrictRoomRepository : IRoomRepository {
+public class InMemoryStrictRoomRepository : IRoomRepository
+{
     private readonly List<Room> _repository = [];
 
     /// <summary>
@@ -24,7 +25,7 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     public async Task AddAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
-            _repository.Add(new (room));
+            _repository.Add(new(room));
         else throw new RepositoryException("Room with this id already exists.");
     }
 
@@ -35,7 +36,7 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     /// <exception cref="InvalidArgumentException">if the room with this id does not exist.</exception>
     public async Task RemoveAsync(string id)
     {
-        if (_repository.RemoveAll(r => r.Id == id) == 0) 
+        if (_repository.RemoveAll(r => r.Id == id) == 0)
             throw new RepositoryException("Room with this id does not exist.");
     }
 
@@ -51,7 +52,7 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
         var room = _repository.Find(r => r.Id == id);
 
         if (room is null) return null;
-        else return new (room);
+        else return new(room);
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
             throw new RepositoryException("Room with this id does not exist.");
-        
+
         _repository[_repository.FindIndex(r => r.Id == room.Id)] = room;
     }
 
@@ -71,7 +72,8 @@ public class InMemoryStrictRoomRepository : IRoomRepository {
     /// Get all repository elements.
     /// </summary>
     /// <returns>Collection of repository elements.</returns>
-    public async Task<IReadOnlyCollection<Room>> GetAllAsync() { 
+    public async Task<IReadOnlyCollection<Room>> GetAllAsync()
+    {
         if (_repository.Count is 0) return [];
         var result = new List<Room>();
         result.AddRange(_repository.Select(r => new Room(r)));

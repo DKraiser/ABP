@@ -14,33 +14,39 @@ public class ForbiddenPeriodPolicy : IBookingPolicy
     private readonly TimeOnly _forbiddenPeriodStart;
     private readonly TimeOnly _forbiddenPeriodEnd;
 
-    public ForbiddenPeriodPolicy (TimeOnly forbiddenPeriodStart, TimeOnly forbiddenPeriodEnd) { 
+    public ForbiddenPeriodPolicy(TimeOnly forbiddenPeriodStart, TimeOnly forbiddenPeriodEnd)
+    {
         if (forbiddenPeriodStart == forbiddenPeriodEnd)
             throw new ArgumentException("Period duration must be positive.");
-        
+
         _forbiddenPeriodStart = forbiddenPeriodStart;
         _forbiddenPeriodEnd = forbiddenPeriodEnd;
     }
 
     public bool IsAllowed(Domain.Entities.Booking booking)
-    { 
-        if (_forbiddenPeriodStart < _forbiddenPeriodEnd) {
-            if (booking.StartTime.Date == booking.EndTime.Date) { 
-                return booking.StartTime.TimeOfDay >= _forbiddenPeriodEnd.ToTimeSpan() || 
+    {
+        if (_forbiddenPeriodStart < _forbiddenPeriodEnd)
+        {
+            if (booking.StartTime.Date == booking.EndTime.Date)
+            {
+                return booking.StartTime.TimeOfDay >= _forbiddenPeriodEnd.ToTimeSpan() ||
                     booking.EndTime.TimeOfDay <= _forbiddenPeriodStart.ToTimeSpan();
             }
-            else if (booking.StartTime.Date.AddDays(1) == booking.EndTime.Date) { 
+            else if (booking.StartTime.Date.AddDays(1) == booking.EndTime.Date)
+            {
                 return booking.StartTime.TimeOfDay >= _forbiddenPeriodEnd.ToTimeSpan() &&
-                    booking.EndTime.TimeOfDay <= _forbiddenPeriodStart.ToTimeSpan(); 
+                    booking.EndTime.TimeOfDay <= _forbiddenPeriodStart.ToTimeSpan();
             }
             else return false;
         }
-        else {
-            if (booking.StartTime.Date == booking.EndTime.Date) { 
+        else
+        {
+            if (booking.StartTime.Date == booking.EndTime.Date)
+            {
                 return booking.StartTime.TimeOfDay >= _forbiddenPeriodEnd.ToTimeSpan() &&
                     booking.EndTime.TimeOfDay <= _forbiddenPeriodStart.ToTimeSpan();
-            } 
-            else return false; 
+            }
+            else return false;
         }
     }
 }

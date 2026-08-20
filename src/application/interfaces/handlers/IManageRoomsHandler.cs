@@ -7,7 +7,8 @@ namespace ABP.Application.Interfaces.Handlers;
 /// <summary>
 /// Business rules contract that exposes CRUD functionality for rooms managing. 
 /// </summary>
-public interface IManageRoomsHandler {
+public interface IManageRoomsHandler
+{
     public Task<Result<string>> CreateAsync(CreateRoomCommand command);
     public Task<Result<IReadOnlyList<RoomInfo>>> ListAllRoomsAsync();
     public Task<Result<RoomInfo>> FindAsync(FindRoomCommand command);

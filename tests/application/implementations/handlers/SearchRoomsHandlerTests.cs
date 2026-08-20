@@ -48,7 +48,8 @@ public class SearchRoomsHandlerTests
 
         var result = await _handler.SearchRoomsAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Has.Count.EqualTo(1));
             Assert.That(result.Value[0].Id, Is.EqualTo(largeRoom.Id));
@@ -91,7 +92,8 @@ public class SearchRoomsHandlerTests
 
         var result = await _handler.SearchRoomsAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Has.Count.EqualTo(1));
             Assert.That(result.Value[0].Id, Is.EqualTo(availableRoom.Id));
@@ -140,7 +142,8 @@ public class SearchRoomsHandlerTests
 
         var result = await _handler.SearchRoomsAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Is.Empty);
         });
@@ -170,7 +173,8 @@ public class SearchRoomsHandlerTests
 
         var result = await _handler.SearchRoomsAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Is.Empty);
         });
@@ -199,7 +203,8 @@ public class SearchRoomsHandlerTests
 
         var result = await _handler.SearchRoomsAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Has.Count.EqualTo(1));
             Assert.That(result.Value[0].Id, Is.EqualTo(room.Id));
@@ -230,7 +235,8 @@ public class SearchRoomsHandlerTests
 
         var result = await _handler.SearchRoomsAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
 
             var info = result.Value[0];

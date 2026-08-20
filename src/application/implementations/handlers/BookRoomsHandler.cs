@@ -1,7 +1,6 @@
 using ABP.Application.Dto.Commands.BookRoomsHandler;
 using ABP.Application.Dto.Errors;
 using ABP.Application.Dto.Infos;
-using ABP.Application.Exceptions;
 using ABP.Application.Interfaces.Handlers;
 using ABP.Application.Interfaces.Policies;
 using ABP.Application.Interfaces.Repositories;
@@ -12,8 +11,8 @@ using ABP.Domain.Result;
 namespace ABP.Application.Implementations.Handlers;
 
 public class BookRoomsHandler(
-    IBookingRepository bookingRepository, 
-    IRoomRepository roomRepository, 
+    IBookingRepository bookingRepository,
+    IRoomRepository roomRepository,
     IReadOnlyList<IBookingPolicy> bookingPolicies,
     IReadOnlyList<IPricingPolicy> pricingPolicies
 ) : IBookRoomsHandler
@@ -22,7 +21,7 @@ public class BookRoomsHandler(
     private readonly IRoomRepository _roomRepository = roomRepository;
     private readonly IReadOnlyList<IBookingPolicy> _bookingPolicies = bookingPolicies;
     private readonly IReadOnlyList<IPricingPolicy> _pricingPolicies = pricingPolicies;
-    
+
     /// <summary>
     /// Books the room if booking does not violate anything.
     /// </summary>
@@ -38,9 +37,11 @@ public class BookRoomsHandler(
         // Check if requested room exists.
         var room = await _roomRepository.FindByIdAsync(command.RoomId);
 
-        if (room is null) {
+        if (room is null)
+        {
             // If room was not found, return a failure.
-            var notFoundProblems = new Dictionary<string, string[]> {
+            var notFoundProblems = new Dictionary<string, string[]>
+            {
                 ["Room"] = ["Room with this id does not exist."]
             };
 
@@ -59,8 +60,8 @@ public class BookRoomsHandler(
             var service = room.AvailableServices
                 .FirstOrDefault(s => s.Id == id);
 
-            if (service is null)         
-            {   
+            if (service is null)
+            {
                 notExistingServices.Add($"Service '{id}' is not available in this room.");
                 continue;
             }
@@ -70,8 +71,10 @@ public class BookRoomsHandler(
 
         // If some of requested services were not found, 
         // return the corresponding error.
-        if (notExistingServices.Count is not 0) {
-            var problems = new Dictionary<string, string[]> {
+        if (notExistingServices.Count is not 0)
+        {
+            var problems = new Dictionary<string, string[]>
+            {
                 ["Service"] = [.. notExistingServices]
             };
 
@@ -113,13 +116,14 @@ public class BookRoomsHandler(
         }
 
         // Check if booking does not conflict with other ones.
-        if ((await _bookingRepository.GetAllAsync()).Where(b => b.Overlaps(booking)).Any()) {
+        if ((await _bookingRepository.GetAllAsync()).Where(b => b.Overlaps(booking)).Any())
+        {
             var problems = new Dictionary<string, string[]>
             {
                 ["Booking"] = ["The booking overlaps an already existing one."]
             };
 
-            return Result<BookingConfirmationInfo>.Failure(new ConflictError (problems));
+            return Result<BookingConfirmationInfo>.Failure(new ConflictError(problems));
         }
 
         // Calculate price.

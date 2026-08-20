@@ -9,7 +9,8 @@ namespace ABP.Infrastructure.Repositories.InMemory.Soft;
 /// <remarks>
 /// Soft means that if entry with this id already exists, operation is silently ignored.
 /// </remarks>
-public class InMemorySoftRoomRepository : IRoomRepository {
+public class InMemorySoftRoomRepository : IRoomRepository
+{
     private readonly List<Room> _repository = [];
 
     /// <summary>
@@ -22,7 +23,7 @@ public class InMemorySoftRoomRepository : IRoomRepository {
     public async Task AddAsync(Room room)
     {
         if (_repository.Find(r => r.Id == room.Id) is null)
-            _repository.Add(new (room));
+            _repository.Add(new(room));
     }
 
     /// <summary>
@@ -49,7 +50,7 @@ public class InMemorySoftRoomRepository : IRoomRepository {
         var room = _repository.Find(r => r.Id == id);
 
         if (room is null) return null;
-        else return new (room);
+        else return new(room);
     }
 
     /// <summary>
@@ -67,7 +68,8 @@ public class InMemorySoftRoomRepository : IRoomRepository {
     /// Get all repository elements.
     /// </summary>
     /// <returns>Collection of repository elements.</returns>
-    public async Task<IReadOnlyCollection<Room>> GetAllAsync() { 
+    public async Task<IReadOnlyCollection<Room>> GetAllAsync()
+    {
         if (_repository.Count is 0) return [];
         var result = new List<Room>();
         result.AddRange(_repository.Select(r => new Room(r)));

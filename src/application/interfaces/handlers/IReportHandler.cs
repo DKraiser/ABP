@@ -5,7 +5,8 @@ namespace ABP.Application.Interfaces.Handlers;
 /// <summary>
 /// Some useful reports for business.
 /// </summary>
-public interface IReportHandler { 
+public interface IReportHandler
+{
     /// <summary>
     /// Lists how many hours of booking in stated period each room has had.
     /// </summary>

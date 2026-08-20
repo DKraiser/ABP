@@ -5,7 +5,8 @@ using NUnit;
 namespace ABP.Tests.Application.Implementations;
 
 [TestFixture]
-public class HoursPricePolicyTests {
+public class HoursPricePolicyTests
+{
     private HoursPricePolicy _calculator = null!;
     private Room _room = null!;
 

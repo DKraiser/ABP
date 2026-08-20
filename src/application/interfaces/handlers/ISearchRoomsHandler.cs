@@ -8,6 +8,7 @@ namespace ABP.Application.Interfaces.Handlers;
 /// <summary>
 /// Search rooms handler. 
 /// </summary>
-public interface ISearchRoomsHandler {
-    public Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync (SearchRoomsCommand command);
+public interface ISearchRoomsHandler
+{
+    public Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync(SearchRoomsCommand command);
 }

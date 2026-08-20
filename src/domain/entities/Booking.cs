@@ -5,7 +5,8 @@ namespace ABP.Domain.Entities;
 /// <summary>
 /// Object representing booking of a room. 
 /// </summary>
-public class Booking : IEquatable<Booking> { 
+public class Booking : IEquatable<Booking>
+{
     private readonly string _id;
     private Room _room;
     private DateTime _startTime;
@@ -23,9 +24,11 @@ public class Booking : IEquatable<Booking> {
     /// Gets and sets not null room.
     /// </summary>
     /// <value>Booked room.</value>
-    public Room Room { 
+    public Room Room
+    {
         get => _room;
-        set {
+        set
+        {
             if (value is null)
                 throw new DomainRulesViolationException("Room must be not null.");
             _room = value;
@@ -36,9 +39,11 @@ public class Booking : IEquatable<Booking> {
     /// Gets and sets booking start time.
     /// </summary>
     /// <value>Start time of booking.</value>
-    public DateTime StartTime {
+    public DateTime StartTime
+    {
         get => _startTime;
-        set { 
+        set
+        {
             if (value >= _endTime)
                 throw new DomainRulesViolationException("Start time must be lower than end time.");
             _startTime = value;
@@ -49,25 +54,29 @@ public class Booking : IEquatable<Booking> {
     /// Gets and sets booking end time.
     /// </summary>
     /// <value>End time of booking.</value>
-    public DateTime EndTime {
+    public DateTime EndTime
+    {
         get => _endTime;
-        set { 
+        set
+        {
             if (value <= _startTime)
                 throw new DomainRulesViolationException("End time must be greater than start time.");
-            _endTime = value;            
+            _endTime = value;
         }
     }
-    
+
     /// <summary>
     /// Gets and sets booking price.
     /// </summary>
     /// <value>End time of booking.</value>
-    public decimal Price {
+    public decimal Price
+    {
         get => _price;
-        set { 
+        set
+        {
             if (value <= 0)
                 throw new DomainRulesViolationException("Price must be greater than zero.");
-            _price = value;            
+            _price = value;
         }
     }
 
@@ -79,7 +88,8 @@ public class Booking : IEquatable<Booking> {
     /// <param name="room">The booked room.</param>
     /// <param name="startTime">Booking start time.</param>
     /// <param name="endTime">Booking end time.</param>
-    public Booking (Room room, DateTime startTime, DateTime endTime, IEnumerable<Service> requestedServices) { 
+    public Booking(Room room, DateTime startTime, DateTime endTime, IEnumerable<Service> requestedServices)
+    {
         if (room is null)
             throw new DomainRulesViolationException("Room cannot be null");
         if (startTime >= endTime)
@@ -90,16 +100,17 @@ public class Booking : IEquatable<Booking> {
         _startTime = startTime;
         _endTime = endTime;
         _requestedServices = [];
-        foreach (var s in requestedServices) _requestedServices.Add(new (s));
+        foreach (var s in requestedServices) _requestedServices.Add(new(s));
     }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other">Booking to be copied.</param>
-    public Booking (Booking other) { 
+    public Booking(Booking other)
+    {
         _id = other.Id;
-        _room = new (other._room);
+        _room = new(other._room);
         _startTime = other._startTime;
         _endTime = other._endTime;
         _price = other._price;
@@ -112,9 +123,10 @@ public class Booking : IEquatable<Booking> {
     /// </summary>
     /// <param name="other">Other booking object.</param>
     /// <returns>Whether 2 bookings overlaps.</returns>
-    public bool Overlaps (Booking other) { 
+    public bool Overlaps(Booking other)
+    {
         if (!this.Room.Equals(other.Room)) return false;
-        
+
         if (this.StartTime < other.EndTime && this.EndTime <= other.StartTime ||
             this.EndTime > other.StartTime && this.StartTime >= other.EndTime) return false;
         else return true;
@@ -124,9 +136,10 @@ public class Booking : IEquatable<Booking> {
     /// Value equality check.
     /// </summary>
     /// <param name="other">Another instance this compared with.</param>
-    public bool Equals(Booking? other) {
+    public bool Equals(Booking? other)
+    {
         if (other is null) return false;
-        return _id == other._id && 
+        return _id == other._id &&
             _room.Equals(other._room) &&
             _startTime == other._startTime &&
             _endTime == other._endTime &&
@@ -134,11 +147,12 @@ public class Booking : IEquatable<Booking> {
             _requestedServices.All(s => other.RequestedServices.Contains(s));
     }
 
-    public override bool Equals(object? obj) {
+    public override bool Equals(object? obj)
+    {
         if (obj is not Booking) return false;
         else return Equals(obj as Booking);
     }
 
-    public override int GetHashCode() => 
+    public override int GetHashCode() =>
         HashCode.Combine(Id);
 }

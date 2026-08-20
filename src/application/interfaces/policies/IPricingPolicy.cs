@@ -5,7 +5,8 @@ namespace ABP.Application.Interfaces.Policies;
 /// <summary>
 /// Mechanism calculating price of booking according to concrete pricing policy.
 /// </summary>
-public interface IPricingPolicy {
+public interface IPricingPolicy
+{
     /// <summary>
     /// Calculate price booking.
     /// </summary>

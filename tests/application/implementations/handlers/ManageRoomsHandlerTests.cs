@@ -43,7 +43,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.CreateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Is.Not.Null);
         });
@@ -71,7 +72,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.CreateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Is.EqualTo(addedRoom!.Id));
         });
@@ -88,8 +90,9 @@ public class ManageRoomsHandlerTests
             []);
 
         var result = await _handler.CreateAsync(command);
-        
-        Assert.Multiple(() => {
+
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<DomainRulesViolationError>());
         });
@@ -113,8 +116,9 @@ public class ManageRoomsHandlerTests
         var command = new CreateRoomCommand("A", 10, 100, []);
 
         var result = await _handler.CreateAsync(command);
-        
-        Assert.Multiple(() => {
+
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<ConflictError>());
         });
@@ -144,7 +148,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.FindAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value!.Id, Is.EqualTo(_room.Id));
             Assert.That(result.Value.Name, Is.EqualTo(_room.Name));
@@ -164,7 +169,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.FindAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<NotFoundError>());
         });
@@ -187,7 +193,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.ListAllRoomsAsync();
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Has.Count.EqualTo(2));
 
@@ -208,7 +215,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.ListAllRoomsAsync();
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value, Is.Empty);
         });
@@ -234,7 +242,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.UpdateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
 
             Assert.That(_room.Name, Is.EqualTo("Updated room"));
@@ -258,7 +267,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.UpdateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<NotFoundError>());
         });
@@ -280,7 +290,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.UpdateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(
                 result.Error,
@@ -290,7 +301,7 @@ public class ManageRoomsHandlerTests
                 r => r.UpdateAsync(It.IsAny<Room>()),
                 Times.Never);
         });
-        
+
     }
 
     [Test]
@@ -310,7 +321,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.UpdateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(_room.AvailableServices, Does.Contain(service));
         });
@@ -338,7 +350,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.UpdateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(
                 _room.AvailableServices.Any(s => s.Id == service.Id),
@@ -368,7 +381,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.UpdateAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(_room.Name, Is.EqualTo("New name"));
             Assert.That(_room.Capacity, Is.EqualTo(originalCapacity));
@@ -413,7 +427,8 @@ public class ManageRoomsHandlerTests
 
         var result = await _handler.DeleteAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<NotFoundError>());
         });

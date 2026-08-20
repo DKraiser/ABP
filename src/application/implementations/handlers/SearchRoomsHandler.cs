@@ -23,20 +23,24 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
         var from = command.Date.ToDateTime(command.StartTime);
         var to = command.Date.ToDateTime(command.EndTime);
 
-        if (from >= to) { 
+        if (from >= to)
+        {
             return Result<IReadOnlyList<RoomInfo>>.Failure(
                 new DomainRulesViolationError(
-                    new Dictionary<string, string[]>() { 
+                    new Dictionary<string, string[]>()
+                    {
                         ["Booking period"] = ["Booking period length must be positive"]
                     }
                 )
             );
         }
 
-        if (command.MinimalCapacity < 0) { 
+        if (command.MinimalCapacity < 0)
+        {
             return Result<IReadOnlyList<RoomInfo>>.Failure(
                 new DomainRulesViolationError(
-                    new Dictionary<string, string[]>() { 
+                    new Dictionary<string, string[]>()
+                    {
                         ["Minimal capacity"] = ["Minimal capacity must be greater than zero."]
                     }
                 )

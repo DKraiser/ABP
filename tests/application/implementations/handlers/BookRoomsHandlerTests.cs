@@ -72,7 +72,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<NotFoundError>());
         });
@@ -99,7 +100,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<NotFoundError>());
         });
@@ -121,7 +123,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<NotFoundError>());
         });
@@ -151,7 +154,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(
                 result.Error,
@@ -183,7 +187,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(
                 result.Error,
@@ -275,7 +280,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.False);
             Assert.That(result.Error, Is.TypeOf<ConflictError>());
         });
@@ -335,7 +341,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(CreateCommand());
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value!.Price, Is.EqualTo(150));
         });
@@ -378,7 +385,8 @@ public class BookRoomsHandlerTests
 
         var result = await handler.BookRoomAsync(CreateCommand());
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.Value!.Price, Is.EqualTo(150));
         });
@@ -445,7 +453,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
 
             Assert.That(result.Value!.Price, Is.EqualTo(120));
@@ -487,7 +496,8 @@ public class BookRoomsHandlerTests
 
         var result = await _handler.BookRoomAsync(command);
 
-        Assert.Multiple(() => {
+        Assert.Multiple(() =>
+        {
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(createdBooking, Is.Not.Null);
             Assert.That(createdBooking!.RequestedServices, Has.Count.EqualTo(1));

@@ -245,7 +245,7 @@ public class ForbiddenPeriodPolicyTests
             new DateTime(2026, 8, 17, 22, 0, 0),
             new DateTime(2026, 8, 18, 11, 0, 0),
             []);
-        
+
         Assert.That(policy.IsAllowed(booking), Is.False);
-    }    
+    }
 }

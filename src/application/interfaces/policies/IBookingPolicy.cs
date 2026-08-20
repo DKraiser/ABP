@@ -5,7 +5,8 @@ namespace ABP.Application.Interfaces.Policies;
 /// <summary>
 /// Mechanism checking if particular bookings are allowed.
 /// </summary>
-public interface IBookingPolicy {
+public interface IBookingPolicy
+{
     /// <summary>
     /// Check if such type of booking is allowed.
     /// </summary>

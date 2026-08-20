@@ -5,7 +5,8 @@ namespace ABP.Domain.Entities;
 /// <summary>
 /// Provides an entity of a room.
 /// </summary>
-public class Room : IEquatable<Room>{ 
+public class Room : IEquatable<Room>
+{
     private readonly string _id;
     private string _name;
     private int _capacity;
@@ -23,13 +24,15 @@ public class Room : IEquatable<Room>{
     /// </summary>
     /// <value>Name of the room.</value>
     /// <exception cref="DomainRulesViolationException">if name of room is empty</exception>
-    public string Name { 
+    public string Name
+    {
         get => _name;
-        set {
+        set
+        {
             if (string.IsNullOrWhiteSpace(value))
                 throw new DomainRulesViolationException("Name must be not empty.");
             _name = value;
-        } 
+        }
     }
 
     /// <summary>
@@ -37,13 +40,15 @@ public class Room : IEquatable<Room>{
     /// </summary>
     /// <value>Capacity of the room.</value>
     /// <exception cref="DomainRulesViolationException">if room capacity is lower than or equal to 0.</exception>
-    public int Capacity { 
-        get => _capacity; 
-        set {
-            if (value <= 0) 
+    public int Capacity
+    {
+        get => _capacity;
+        set
+        {
+            if (value <= 0)
                 throw new DomainRulesViolationException("Capacity must be a positive number.");
             _capacity = value;
-        } 
+        }
     }
 
     /// <summary>
@@ -51,13 +56,15 @@ public class Room : IEquatable<Room>{
     /// </summary>
     /// <value>Base price of the room rent.</value>
     /// <exception cref="DomainRulesViolationException">if room base price is lower than or equal to 0.</exception>
-    public decimal BasePrice {
+    public decimal BasePrice
+    {
         get => _basePrice;
-        set {
+        set
+        {
             if (value <= 0)
                 throw new DomainRulesViolationException("Base price must be a positive number.");
             _basePrice = value;
-        } 
+        }
     }
 
     /// <summary>
@@ -71,7 +78,8 @@ public class Room : IEquatable<Room>{
     /// </summary>
     /// <param name="service">Service to add.</param>
     /// <exception cref="DomainRulesViolationException">if service with this id already exists.</exception>
-    public void AddService(Service service) { 
+    public void AddService(Service service)
+    {
         if (_availableServices.Exists(s => s.Id == service.Id))
             throw new DomainRulesViolationException("Room already provides service with this id.");
         _availableServices.Add(service);
@@ -82,10 +90,11 @@ public class Room : IEquatable<Room>{
     /// </summary>
     /// <param name="service">Service to update.</param>
     /// <exception cref="DomainRulesViolationException">if service with this id does not exist.</exception>
-    public void UpdateService(Service service) {
-        if (_availableServices.RemoveAll(s => s.Id == service.Id) is 0) 
+    public void UpdateService(Service service)
+    {
+        if (_availableServices.RemoveAll(s => s.Id == service.Id) is 0)
             throw new DomainRulesViolationException("Room already provides service with this id.");
-        
+
         _availableServices.Add(service);
     }
 
@@ -94,7 +103,8 @@ public class Room : IEquatable<Room>{
     /// </summary>
     /// <param name="id">Id of service to remove.</param>
     /// <exception cref="DomainRulesViolationException">if service with this id does not exist.</exception>
-    public void RemoveService(string id) {
+    public void RemoveService(string id)
+    {
         if (_availableServices.RemoveAll(s => s.Id == id) is 0)
             throw new DomainRulesViolationException("Room already provides service with this id.");
     }
@@ -107,10 +117,11 @@ public class Room : IEquatable<Room>{
     /// <param name="basePrice">Price of the room.</param>
     /// <param name="services">List of services available for this room.</param>
     /// <exception cref="DomainRulesViolationException">if rooms capacity is lower than or equal to 0.</exception>
-    public Room (string name, int capacity, decimal basePrice, IReadOnlyList<Service> services) {
-        if (string.IsNullOrWhiteSpace(name)) 
+    public Room(string name, int capacity, decimal basePrice, IReadOnlyList<Service> services)
+    {
+        if (string.IsNullOrWhiteSpace(name))
             throw new DomainRulesViolationException("Name of the room cannot be null");
-        
+
         _id = Guid.NewGuid().ToString();
         _name = name;
         Capacity = capacity;
@@ -123,33 +134,36 @@ public class Room : IEquatable<Room>{
     /// Copy constructor.
     /// </summary>
     /// <param name="other">Room to be copied.</param>
-    public Room (Room other) { 
+    public Room(Room other)
+    {
         _id = other._id;
         _name = other._name;
         _capacity = other._capacity;
         _basePrice = other._basePrice;
         _availableServices.AddRange(other._availableServices.Select(s => new Service(s)));
     }
-    
+
     /// <summary>
     /// Value equality check.
     /// </summary>
     /// <param name="room">Another room, examined for equality.</param>
-    public bool Equals(Room? room) {
+    public bool Equals(Room? room)
+    {
         if (room is null) return false;
-        return room._id == _id && 
+        return room._id == _id &&
             room._name == _name &&
-            room._basePrice == _basePrice && 
+            room._basePrice == _basePrice &&
             room._capacity == _capacity &&
             room._availableServices.All(s => _availableServices.Contains(s)) &&
             room._availableServices.Count == _availableServices.Count;
     }
 
-    public override bool Equals(object? obj) {
+    public override bool Equals(object? obj)
+    {
         if (obj is not Room) return false;
         else return Equals(obj as Room);
     }
 
-    public override int GetHashCode() => 
+    public override int GetHashCode() =>
         HashCode.Combine(Id);
 }

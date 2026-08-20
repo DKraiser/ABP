@@ -6,34 +6,39 @@ using ABP.Application.Exceptions;
 namespace ABP.Tests.Infrastructure.Repositories.InMemory.Strict;
 
 [TestFixture]
-public class InMemoryStrictBookingRepositoryTests {
+public class InMemoryStrictBookingRepositoryTests
+{
     InMemoryStrictBookingRepository repository;
     Booking booking;
     Room room;
 
     [SetUp]
-    public async Task SetUp() {
-        room = new ("A", 50, 2000, []);
-        booking = new (room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
-        repository = new ();
+    public async Task SetUp()
+    {
+        room = new("A", 50, 2000, []);
+        booking = new(room, new DateTime(2000, 1, 1, 8, 0, 0), new DateTime(2000, 1, 1, 12, 0, 0), []);
+        repository = new();
         await repository.AddAsync(booking);
     }
 
-    [Test] 
-    public async Task FindBooking_Existing() {
+    [Test]
+    public async Task FindBooking_Existing()
+    {
         var foundBooking = await repository.FindByIdAsync(booking.Id);
         Assert.That(booking, Is.EqualTo(foundBooking));
         Assert.That(() => booking == foundBooking, Is.False);
     }
 
-    [Test] 
-    public async Task FindBooking_NotExisting() {
+    [Test]
+    public async Task FindBooking_NotExisting()
+    {
         var foundBooking = await repository.FindByIdAsync("Some string id");
         Assert.That(foundBooking, Is.Null);
     }
 
     [Test]
-    public async Task AddBooking_New() { 
+    public async Task AddBooking_New()
+    {
         var newBooking = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
         Assert.That(await repository.FindByIdAsync(newBooking.Id), Is.Null);
 
@@ -44,39 +49,45 @@ public class InMemoryStrictBookingRepositoryTests {
     }
 
     [Test]
-    public async Task AddBooking_Duplicate() { 
+    public async Task AddBooking_Duplicate()
+    {
         var duplicate = new Booking(booking);
         Assert.ThrowsAsync<RepositoryException>(async () => await repository.AddAsync(duplicate));
     }
 
     [Test]
-    public async Task RemoveBooking_Existing() {
+    public async Task RemoveBooking_Existing()
+    {
         var oldCount = (await repository.GetAllAsync()).ToList().Count;
         await repository.DeleteAsync(booking.Id);
         var newCount = (await repository.GetAllAsync()).ToList().Count;
 
-        Assert.Multiple(async () => {
+        Assert.Multiple(async () =>
+        {
             Assert.That(oldCount, Is.EqualTo(newCount + 1));
             Assert.That(await repository.FindByIdAsync(booking.Id), Is.Null);
         });
     }
 
     [Test]
-    public async Task RemoveBooking_NotExisting() {
+    public async Task RemoveBooking_NotExisting()
+    {
         Assert.ThrowsAsync<RepositoryException>(async () => await repository.DeleteAsync("Some string id"));
     }
 
     [Test]
-    public async Task UpdateBooking_Existing() {
+    public async Task UpdateBooking_Existing()
+    {
         var updatedBooking = await repository.FindByIdAsync(booking.Id);
 
         updatedBooking?.StartTime = updatedBooking.StartTime.AddHours(1);
 
         await repository.UpdateAsync(updatedBooking);
 
-        Assert.Multiple(async () => { 
+        Assert.Multiple(async () =>
+        {
             var foundUpdatedBooking = await repository.FindByIdAsync(booking.Id);
-            Assert.That(updatedBooking.Id == booking.Id && 
+            Assert.That(updatedBooking.Id == booking.Id &&
                 booking.Id == foundUpdatedBooking?.Id, Is.True);
             Assert.That(updatedBooking == foundUpdatedBooking, Is.False);
             Assert.That(updatedBooking, Is.EqualTo(foundUpdatedBooking));
@@ -85,22 +96,26 @@ public class InMemoryStrictBookingRepositoryTests {
     }
 
     [Test]
-    public async Task UpdateBooking_NotExisting() {
+    public async Task UpdateBooking_NotExisting()
+    {
         var newBooking = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
         Assert.ThrowsAsync<RepositoryException>(async () => await repository.UpdateAsync(newBooking));
     }
 
     [Test]
-    public async Task GetAllBookings() { 
+    public async Task GetAllBookings()
+    {
         var all = await repository.GetAllAsync();
-        Assert.Multiple(async () => {
+        Assert.Multiple(async () =>
+        {
             Assert.That(all.ToList(), Has.Count.EqualTo(1));
             Assert.That(all.ToList()[0], Is.EqualTo(booking));
         });
     }
 
     [Test]
-    public async Task FindByDateTime() {
+    public async Task FindByDateTime()
+    {
         var booking1 = new Booking(room, new DateTime(2000, 1, 1, 12, 0, 0), new DateTime(2000, 1, 1, 13, 0, 0), []);
         var booking2 = new Booking(room, new DateTime(2000, 1, 1, 14, 0, 0), new DateTime(2000, 1, 1, 18, 0, 0), []);
         var booking3 = new Booking(room, new DateTime(2000, 1, 1, 0, 0, 0), new DateTime(2000, 1, 1, 10, 0, 0), []);
@@ -112,8 +127,9 @@ public class InMemoryStrictBookingRepositoryTests {
 
         var relevant = (await repository.FindByDateTimeStrictlyInAsync
             (new DateTime(2000, 1, 1, 2, 0, 0), new DateTime(2000, 1, 1, 13, 30, 0))).ToList();
-                
-        Assert.Multiple(() => {
+
+        Assert.Multiple(() =>
+        {
             Assert.That(relevant, Has.Count.EqualTo(2));
             Assert.That(relevant, Contains.Item(booking));
             Assert.That(relevant, Contains.Item(booking1));

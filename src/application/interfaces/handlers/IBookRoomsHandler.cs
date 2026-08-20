@@ -8,6 +8,7 @@ namespace ABP.Application.Interfaces.Handlers;
 /// <summary>
 /// Searching and booking rooms handler. 
 /// </summary>
-public interface IBookRoomsHandler {
+public interface IBookRoomsHandler
+{
     public Task<Result<BookingConfirmationInfo>> BookRoomAsync(BookRoomCommand command);
 }

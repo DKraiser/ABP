@@ -4,7 +4,8 @@ using ABP.Application.Exceptions;
 
 namespace ABP.Infrastructure.Repositories.InMemory.Strict;
 
-public class InMemoryStrictBookingRepository : IBookingRepository {
+public class InMemoryStrictBookingRepository : IBookingRepository
+{
     private readonly List<Booking> _repository = [];
 
     /// <summary>
@@ -29,8 +30,8 @@ public class InMemoryStrictBookingRepository : IBookingRepository {
     /// <exception cref="InvalidArgumentException">if the booking with this id does not exist.</exception>
     public async Task DeleteAsync(string id)
     {
-        if (_repository.RemoveAll(b => b.Id == id) is 0) 
-            throw new RepositoryException("Booking with this id does not exist.");       
+        if (_repository.RemoveAll(b => b.Id == id) is 0)
+            throw new RepositoryException("Booking with this id does not exist.");
     }
 
     /// <summary>
@@ -43,9 +44,9 @@ public class InMemoryStrictBookingRepository : IBookingRepository {
     public async Task<Booking?> FindByIdAsync(string id)
     {
         var booking = _repository.Find(b => b.Id == id);
-        
+
         if (booking is null) return null;
-        else return new (booking);
+        else return new(booking);
     }
 
     /// <summary>
@@ -56,7 +57,8 @@ public class InMemoryStrictBookingRepository : IBookingRepository {
     /// </remarks>
     /// <param name="from">Lower limit of search.</param>
     /// <param name="to">Upper limit of search.</param>
-    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeStrictlyInAsync(DateTime from, DateTime to) {
+    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeStrictlyInAsync(DateTime from, DateTime to)
+    {
         return _repository.FindAll(b => b.StartTime >= from && b.EndTime <= to);
     }
 
@@ -68,7 +70,8 @@ public class InMemoryStrictBookingRepository : IBookingRepository {
     /// </remarks>
     /// <param name="from">Lower limit of search.</param>
     /// <param name="to">Upper limit of search.</param>
-    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeOverlappingAsync(DateTime from, DateTime to) {
+    public async Task<IReadOnlyCollection<Booking>> FindByDateTimeOverlappingAsync(DateTime from, DateTime to)
+    {
         return _repository.FindAll(b => b.StartTime <= from && b.EndTime > from || b.StartTime < to && b.EndTime >= to);
     }
 
@@ -81,7 +84,7 @@ public class InMemoryStrictBookingRepository : IBookingRepository {
     {
         if (_repository.Find(b => b.Id == booking.Id) is null)
             throw new RepositoryException("Booking with this id does not exist.");
-        
+
         _repository[_repository.FindIndex(b => b.Id == booking.Id)] = booking;
     }
 
@@ -89,7 +92,8 @@ public class InMemoryStrictBookingRepository : IBookingRepository {
     /// Get all repository elements.
     /// </summary>
     /// <returns>Collection of repository elements.</returns>
-    public async Task<IReadOnlyCollection<Booking>> GetAllAsync() { 
+    public async Task<IReadOnlyCollection<Booking>> GetAllAsync()
+    {
         if (_repository.Count is 0) return [];
         var result = new List<Booking>();
         result.AddRange(_repository.Select(b => new Booking(b)));

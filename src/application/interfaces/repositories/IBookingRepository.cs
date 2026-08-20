@@ -6,7 +6,8 @@ namespace ABP.Application.Interfaces.Repositories;
 /// <summary>
 /// Abstraction of storage of booking records. 
 /// </summary>
-public interface IBookingRepository { 
+public interface IBookingRepository
+{
     public Task AddAsync(Booking room);
     public Task UpdateAsync(Booking room);
     public Task DeleteAsync(string id);
