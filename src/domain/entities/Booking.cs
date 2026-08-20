@@ -10,6 +10,7 @@ public class Booking : IEquatable<Booking> {
     private Room _room;
     private DateTime _startTime;
     private DateTime _endTime;
+    private decimal _price;
     private readonly List<Service> _requestedServices;
 
     /// <summary>
@@ -56,6 +57,19 @@ public class Booking : IEquatable<Booking> {
             _endTime = value;            
         }
     }
+    
+    /// <summary>
+    /// Gets and sets booking price.
+    /// </summary>
+    /// <value>End time of booking.</value>
+    public decimal Price {
+        get => _price;
+        set { 
+            if (value <= 0)
+                throw new DomainRulesViolationException("Price must be greater than zero.");
+            _price = value;            
+        }
+    }
 
     public List<Service> RequestedServices => _requestedServices;
 
@@ -88,6 +102,7 @@ public class Booking : IEquatable<Booking> {
         _room = new (other._room);
         _startTime = other._startTime;
         _endTime = other._endTime;
+        _price = other._price;
         _requestedServices = [];
         foreach (var s in other.RequestedServices) _requestedServices.Add(new Service(s));
     }

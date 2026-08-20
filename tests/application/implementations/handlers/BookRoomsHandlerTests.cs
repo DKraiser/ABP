@@ -337,7 +337,7 @@ public class BookRoomsHandlerTests
 
         Assert.Multiple(() => {
             Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(result.Value.Price, Is.EqualTo(150));
+            Assert.That(result.Value!.Price, Is.EqualTo(150));
         });
 
         _pricingPolicy.Verify(
@@ -380,7 +380,7 @@ public class BookRoomsHandlerTests
 
         Assert.Multiple(() => {
             Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(result.Value.Price, Is.EqualTo(150));
+            Assert.That(result.Value!.Price, Is.EqualTo(150));
         });
     }
 
@@ -448,7 +448,7 @@ public class BookRoomsHandlerTests
         Assert.Multiple(() => {
             Assert.That(result.IsSuccessful, Is.True);
 
-            Assert.That(result.Value.Price, Is.EqualTo(120));
+            Assert.That(result.Value!.Price, Is.EqualTo(120));
             Assert.That(result.Value.Date, Is.EqualTo(command.Date));
             Assert.That(result.Value.StartTime, Is.EqualTo(command.StartTime));
             Assert.That(result.Value.EndTime, Is.EqualTo(command.EndTime));

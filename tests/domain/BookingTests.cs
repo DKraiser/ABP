@@ -73,6 +73,19 @@ public class BookingTests {
     }
 
     [Test]
+    public void SetPrice_Valid() { 
+        Assert.Multiple(() => {
+            Assert.DoesNotThrow(() => _booking.Price = 10);
+            Assert.That(_booking.Price, Is.EqualTo(10));
+        });
+    }
+
+    [Test]
+    public void SetPrice_Invalid() { 
+        Assert.Throws<DomainRulesViolationException>(() => _booking.Price = -10);
+    }
+
+    [Test]
     public void GetRequestedServices() {
         Assert.That(_booking.RequestedServices, Has.Count.EqualTo(1));
         Assert.That(_booking.RequestedServices[0], Is.EqualTo(_room.AvailableServices[0]));

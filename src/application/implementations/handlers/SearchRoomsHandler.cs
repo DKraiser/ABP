@@ -52,9 +52,9 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
         var bookings = await _bookingRepository.FindByDateTimeOverlappingAsync(from, to);
 
         // IDs of rooms that are already booked.
-        var bookedRoomIds = bookings
+        var bookedRoomIds = bookings?
             .Select(b => b.Room.Id)
-            .ToHashSet();
+            .ToHashSet() ?? [];
 
         // Keep only rooms that aren't booked.
         var spareRooms = suitableRooms

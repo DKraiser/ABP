@@ -77,6 +77,12 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking]);
 
+        _bookingRepository
+            .Setup(r => r.FindByDateTimeOverlappingAsync(
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>()))
+            .ReturnsAsync([booking]);
+
         var command = new SearchRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
@@ -116,6 +122,12 @@ public class SearchRoomsHandlerTests
 
         _bookingRepository
             .Setup(r => r.FindByDateTimeStrictlyInAsync(
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>()))
+            .ReturnsAsync([booking1, booking2]);
+
+        _bookingRepository
+            .Setup(r => r.FindByDateTimeOverlappingAsync(
                 It.IsAny<DateTime>(),
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking1, booking2]);

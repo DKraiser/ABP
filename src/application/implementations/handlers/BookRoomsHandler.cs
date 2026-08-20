@@ -128,6 +128,8 @@ public class BookRoomsHandler(
         foreach (var policy in _pricingPolicies)
             price += policy.CalculatePrice(booking);
 
+        booking.Price = price;
+
         // Store booking.
         await _bookingRepository.AddAsync(booking);
 
