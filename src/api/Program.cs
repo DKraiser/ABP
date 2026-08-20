@@ -208,8 +208,8 @@ roomsGroup.MapDelete("/{id}", async (string id, IManageRoomsHandler handler) => 
 .WithSummary("Deletes a room with the specified id.")
 .WithDescription("Deletes a room with the specified id." +
     "If succeeds, returns Ok, else returns NotFound")
-.Produces(StatusCodes.Status204NoContent)
-.Produces<ProblemDetails>(StatusCodes.Status404NotFound);
+.Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+.Produces(StatusCodes.Status204NoContent);
 
 // ========== Booking endpoints ==========  
 
