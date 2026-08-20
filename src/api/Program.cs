@@ -1,5 +1,7 @@
 using ABP.Api;
 using ABP.Api.Extensions;
+using ABP.Api.Options.InitialPolicies;
+using ABP.Api.Options.InitialRooms;
 using ABP.Api.Requests;
 using ABP.Application.Dto.Commands.BookRoomsHandler;
 using ABP.Application.Dto.Commands.ManageRoomsHandler;
@@ -18,7 +20,28 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ========== Options registration ========== 
+
+#region options
+builder.Services.AddOptions<List<RoomOptions>>()
+    .Bind(builder.Configuration.GetSection(RoomOptions.ConfigurationSectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<List<ForbiddenPeriodPolicyOptions>>()
+    .Bind(builder.Configuration.GetSection(ForbiddenPeriodPolicyOptions.ConfigurationSectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<List<HoursPricePeriodPolicyOptions>>()
+    .Bind(builder.Configuration.GetSection(HoursPricePeriodPolicyOptions.ConfigurationSectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+#endregion
+
 // ========== Service registration ========== 
+
+#region services
 
 builder.Services.AddOpenApi();
 
@@ -30,22 +53,36 @@ builder.Services.AddScoped<ISearchRoomsHandler, SearchRoomsHandler>();
 builder.Services.AddScoped<IBookRoomsHandler, BookRoomsHandler>();
 builder.Services.AddScoped<IReportHandler, ReportHandler>();
 
-builder.Services.AddBookingPolicies([
-    new ForbiddenPeriodPolicy(new (23, 0), new (6, 0))
-]);
+var forbiddenPeriodPolicies = builder.Configuration
+    .GetSection(ForbiddenPeriodPolicyOptions.ConfigurationSectionName)
+    .Get<IReadOnlyList<ForbiddenPeriodPolicyOptions>>();
+var hoursPricingPolicies = builder.Configuration
+    .GetSection(HoursPricePeriodPolicyOptions.ConfigurationSectionName)
+    .Get<IReadOnlyList<HoursPricePeriodPolicyOptions>>();
+    
+builder.Services.AddBookingPolicies(
+    forbiddenPeriodPolicies?.Select(p => new ForbiddenPeriodPolicy(
+        new (p.StartHour, p.StartMinute), 
+        new (p.EndHour, p.EndMinute)
+    )).ToList() ?? []
+);
 builder.Services.AddPricingPolicies([
-    new HoursPricePolicy([
-        new (new (6, 0), new (9, 0), 0.9m),
-        new (new (9, 0), new (12, 0), 1.0m),
-        new (new (12, 0), new (14, 0), 1.15m),
-        new (new (14, 0), new (18, 0), 1.0m),
-        new (new (18, 0), new (23, 0), 0.8m)
-    ])
+    new HoursPricePolicy(
+        hoursPricingPolicies?.Select(p => new PricePeriod(
+            new (p.StartHour, p.StartMinute), 
+            new (p.EndHour, p.EndMinute),
+            Convert.ToDecimal(p.Multiplier)
+        )
+    ).ToList() ?? [])
 ]);
+
+#endregion
 
 var app = builder.Build();
 
 // ========== Configuration ==========  
+
+#region configuration
 
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
@@ -69,38 +106,28 @@ if (app.Environment.IsProduction())
     app.UseExceptionHandler();
 }
 
+#endregion
+
 // ========== Seed ==========  
 
-await using (var scope = app.Services.CreateAsyncScope())
-{
+var initialRooms = app.Configuration
+    .GetSection(RoomOptions.ConfigurationSectionName)
+    .Get<IReadOnlyList<RoomOptions>>() ?? [];
+await using (var scope = app.Services.CreateAsyncScope()) {
     var handler = scope.ServiceProvider.GetRequiredService<IManageRoomsHandler>();
-    await handler.CreateAsync(new CreateRoomCommand(
-        "Room A", 50, 2000, [
-            new ("Projector", 500),
-            new ("WiFi", 300),
-            new ("Sound", 700)
-        ]
-    ));
-    await handler.CreateAsync(new CreateRoomCommand(
-        "Room B", 100, 3500, [
-            new ("Projector", 500),
-            new ("WiFi", 300),
-            new ("Sound", 700)
-        ]
-    ));
-    await handler.CreateAsync(new CreateRoomCommand(
-        "Room C", 30, 1500, [
-            new ("Projector", 500),
-            new ("WiFi", 300),
-            new ("Sound", 700)
-        ]
-    ));
+    
+    foreach (var room in initialRooms ?? []) { 
+        await handler.CreateAsync(new (
+            room.Name, room.Capacity, room.BasePrice, room.AvailableServices?.Select(so => new Service(so.Name, so.Price)).ToList() ?? []
+        ));
+    }
 }
 
 // ========== Room management endpoints ==========  
 
-var roomsGroup = app.MapGroup("/rooms");
+#region endpoints
 
+var roomsGroup = app.MapGroup("/rooms");
 roomsGroup.MapGet("/{id}", async (string id, IManageRoomsHandler handler) =>
 {
     var result = await handler.FindAsync(new FindRoomCommand(id));
@@ -232,7 +259,8 @@ bookingsGroup.MapGet("/spare", async (
     [FromQuery] TimeOnly startTime,
     [FromQuery] TimeOnly endTime,
     [FromQuery] int minimalCapacity,
-    [FromServices] ISearchRoomsHandler handler) =>
+    [FromServices] ISearchRoomsHandler handler
+) =>
 {
     var result = await handler.SearchRoomsAsync(
         new SearchRoomsCommand(date, startTime, endTime, minimalCapacity)
@@ -293,4 +321,6 @@ reportsGroup.MapGet("/utilization", async ([FromQuery] DateOnly from, [FromQuery
 .WithSummary("Room usage over queried period")
 .WithDescription("Returns utilization report for all rooms registered right now.")
 .Produces<IReadOnlyList<RoomUtilizationInfo>>(StatusCodes.Status200OK, "application/json");
+#endregion
+
 app.Run();
