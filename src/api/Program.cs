@@ -121,16 +121,12 @@ roomsGroup.MapGet("/", async (IManageRoomsHandler handler) => {
     if (!result.IsSuccessful)
         return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
 
-    if (result.Value!.Count is 0)
-        return Results.NoContent();
-
     return Results.Ok(result.Value);
 })
 .WithName("List rooms")
 .WithSummary("Lists all existing rooms.")
 .WithDescription("Returns list of `RoomInfo` objects. This method is should not throw errors.")
-.Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json")
-.Produces(StatusCodes.Status204NoContent);
+.Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json");
 
 roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoomsHandler handler) => {
     var result = await handler.CreateAsync(
@@ -236,9 +232,6 @@ bookingsGroup.MapGet("/spare", async (
 
         else return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
     
-    if (!result.Value!.Any())
-        return Results.NoContent();
-
     return Results.Ok(result.Value);
 })
 .WithName("Search spare rooms")
@@ -246,8 +239,7 @@ bookingsGroup.MapGet("/spare", async (
 .WithDescription("Returns list of room info objects representing all " +
     "rooms that are spare and match request criteria."
 )
-.Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json")
-.Produces(StatusCodes.Status204NoContent);
+.Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json");
 
 bookingsGroup.MapPost("/book", async ([FromBody] BookRoomRequest request, IBookRoomsHandler handler) => {
     var result = await handler.BookRoomAsync(
