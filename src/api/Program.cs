@@ -1,5 +1,5 @@
+using ABP.Api;
 using ABP.Api.Extensions;
-using ABP.Api.ProblemDetailz;
 using ABP.Api.Requests;
 using ABP.Application.Dto.Commands.BookRoomsHandler;
 using ABP.Application.Dto.Commands.ManageRoomsHandler;
@@ -48,14 +48,15 @@ var app = builder.Build();
 // ========== Configuration ==========  
 
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
-{ 
+{
     app.UseDeveloperExceptionPage();
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference(o => {
+    app.MapScalarApiReference(o =>
+    {
         o.Metadata = new Dictionary<string, string>(){
             { "Title", "Booking API" },
             { "Description", "Test task for ABP job application." }
@@ -63,13 +64,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (app.Environment.IsProduction()) {
+if (app.Environment.IsProduction())
+{
     app.UseExceptionHandler();
 }
 
 // ========== Seed ==========  
 
-await using (var scope = app.Services.CreateAsyncScope()) {
+await using (var scope = app.Services.CreateAsyncScope())
+{
     var handler = scope.ServiceProvider.GetRequiredService<IManageRoomsHandler>();
     await handler.CreateAsync(new CreateRoomCommand(
         "Room A", 50, 2000, [
@@ -98,15 +101,17 @@ await using (var scope = app.Services.CreateAsyncScope()) {
 
 var roomsGroup = app.MapGroup("/rooms");
 
-roomsGroup.MapGet("/{id}", async (string id, IManageRoomsHandler handler) => { 
+roomsGroup.MapGet("/{id}", async (string id, IManageRoomsHandler handler) =>
+{
     var result = await handler.FindAsync(new FindRoomCommand(id));
-    if (!result.IsSuccessful) {
+    if (!result.IsSuccessful)
+    {
         if (result.Error is NotFoundError)
-            return Results.NotFound(ProblemDetailsFactory.NotFound());
-        else 
-            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+            return Results.NotFound(ApiProblemDetails.NotFound());
+        else
+            return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
     }
-    
+
     return Results.Ok<RoomInfo>(result.Value);
 })
 .WithName("Get room info")
@@ -115,11 +120,12 @@ roomsGroup.MapGet("/{id}", async (string id, IManageRoomsHandler handler) => {
 .Produces<RoomInfo>(StatusCodes.Status200OK, "application/json")
 .Produces<ProblemDetails>(StatusCodes.Status404NotFound, "application/json");
 
-roomsGroup.MapGet("/", async (IManageRoomsHandler handler) => { 
+roomsGroup.MapGet("/", async (IManageRoomsHandler handler) =>
+{
     var result = await handler.ListAllRoomsAsync();
 
     if (!result.IsSuccessful)
-        return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+        return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
 
     return Results.Ok(result.Value);
 })
@@ -128,7 +134,8 @@ roomsGroup.MapGet("/", async (IManageRoomsHandler handler) => {
 .WithDescription("Returns list of `RoomInfo` objects. This method is should not throw errors.")
 .Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json");
 
-roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoomsHandler handler) => {
+roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoomsHandler handler) =>
+{
     var result = await handler.CreateAsync(
         new CreateRoomCommand(
             request.Name,
@@ -138,13 +145,14 @@ roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoom
         )
     );
 
-    if (!result.IsSuccessful) {
+    if (!result.IsSuccessful)
+    {
         if (result.Error is DomainRulesViolationError)
-            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
+            return Results.UnprocessableEntity(ApiProblemDetails.DomainRulesViolation());
         else if (result.Error is ConflictError)
-            return Results.Conflict(ProblemDetailsFactory.Conflict());
-        else 
-            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+            return Results.Conflict(ApiProblemDetails.Conflict());
+        else
+            return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
     }
 
     return Results.CreatedAtRoute<string>("Get room info", new { id = result.Value }, result.Value);
@@ -159,7 +167,8 @@ roomsGroup.MapPost("/", async ([FromBody] CreateRoomRequest request, IManageRoom
 .Produces<ProblemDetails>(StatusCodes.Status409Conflict)
 .Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity);
 
-roomsGroup.MapPut("/{id}", async (string id, [FromBody] UpdateRoomRequest request, IManageRoomsHandler handler) => {
+roomsGroup.MapPut("/{id}", async (string id, [FromBody] UpdateRoomRequest request, IManageRoomsHandler handler) =>
+{
     var result = await handler.UpdateAsync(
         new UpdateRoomCommand(
             id,
@@ -169,16 +178,17 @@ roomsGroup.MapPut("/{id}", async (string id, [FromBody] UpdateRoomRequest reques
             request.NewServices?.Select<ServiceRequestNoId, Service>(r => new Service(r.Name, r.Price)).ToList(),
             request.UpdatedServices?.Select<ServiceRequestId, Service>(r => new Service(r.Id, r.Name, r.Price)).ToList(),
             request.RemovedServices
-        ) 
+        )
     );
 
-    if (!result.IsSuccessful) { 
+    if (!result.IsSuccessful)
+    {
         if (result.Error is NotFoundError)
-            return Results.NotFound(ProblemDetailsFactory.NotFound());
+            return Results.NotFound(ApiProblemDetails.NotFound());
         else if (result.Error is DomainRulesViolationError)
-            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
-        else 
-            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+            return Results.UnprocessableEntity(ApiProblemDetails.DomainRulesViolation());
+        else
+            return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
     }
 
     return Results.NoContent();
@@ -193,13 +203,15 @@ roomsGroup.MapPut("/{id}", async (string id, [FromBody] UpdateRoomRequest reques
 .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
 .Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity);
 
-roomsGroup.MapDelete("/{id}", async (string id, IManageRoomsHandler handler) => {
+roomsGroup.MapDelete("/{id}", async (string id, IManageRoomsHandler handler) =>
+{
     var result = await handler.DeleteAsync(new DeleteRoomCommand(id));
-    if (!result.IsSuccessful) {
+    if (!result.IsSuccessful)
+    {
         if (result.Error is NotFoundError)
-            return Results.NotFound(ProblemDetailsFactory.NotFound());
-        else 
-            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+            return Results.NotFound(ApiProblemDetails.NotFound());
+        else
+            return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
     }
 
     return Results.NoContent();
@@ -220,18 +232,18 @@ bookingsGroup.MapGet("/spare", async (
     [FromQuery] TimeOnly startTime,
     [FromQuery] TimeOnly endTime,
     [FromQuery] int minimalCapacity,
-    [FromServices] ISearchRoomsHandler handler) => 
+    [FromServices] ISearchRoomsHandler handler) =>
 {
     var result = await handler.SearchRoomsAsync(
         new SearchRoomsCommand(date, startTime, endTime, minimalCapacity)
     );
 
-    if (!result.IsSuccessful) 
+    if (!result.IsSuccessful)
         if (result.Error is DomainRulesViolationError)
-            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
+            return Results.UnprocessableEntity(ApiProblemDetails.DomainRulesViolation());
 
-        else return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
-    
+        else return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
+
     return Results.Ok(result.Value);
 })
 .WithName("Search spare rooms")
@@ -241,22 +253,24 @@ bookingsGroup.MapGet("/spare", async (
 )
 .Produces<IReadOnlyList<RoomInfo>>(StatusCodes.Status200OK, "application/json");
 
-bookingsGroup.MapPost("/book", async ([FromBody] BookRoomRequest request, IBookRoomsHandler handler) => {
+bookingsGroup.MapPost("/book", async ([FromBody] BookRoomRequest request, IBookRoomsHandler handler) =>
+{
     var result = await handler.BookRoomAsync(
         new BookRoomCommand(request.RoomId, request.Date, request.StartTime, request.EndTime, request.RequestedServiceIds)
     );
 
-    if (!result.IsSuccessful) { 
+    if (!result.IsSuccessful)
+    {
         if (result.Error is NotFoundError)
-            return Results.NotFound(ProblemDetailsFactory.NotFound());
+            return Results.NotFound(ApiProblemDetails.NotFound());
         else if (result.Error is DomainRulesViolationError)
-            return Results.UnprocessableEntity(ProblemDetailsFactory.DomainRulesViolation());
+            return Results.UnprocessableEntity(ApiProblemDetails.DomainRulesViolation());
         else if (result.Error is BusinessRulesViolationError)
-            return Results.UnprocessableEntity(ProblemDetailsFactory.BusinessRulesViolation());
+            return Results.UnprocessableEntity(ApiProblemDetails.BusinessRulesViolation());
         else if (result.Error is ConflictError)
-            return Results.Conflict(ProblemDetailsFactory.Conflict());
+            return Results.Conflict(ApiProblemDetails.Conflict());
         else
-            return Results.InternalServerError(ProblemDetailsFactory.InternalServerError(result));
+            return Results.InternalServerError(ApiProblemDetails.InternalServerError(result));
     }
 
     return Results.Ok(result.Value);
@@ -271,7 +285,8 @@ bookingsGroup.MapPost("/book", async ([FromBody] BookRoomRequest request, IBookR
 .Produces<ProblemDetails>(StatusCodes.Status422UnprocessableEntity, "application/json");
 
 var reportsGroup = app.MapGroup("/reports");
-reportsGroup.MapGet("/utilization", async ([FromQuery] DateOnly from, [FromQuery] DateOnly to, IReportHandler handler) => {
+reportsGroup.MapGet("/utilization", async ([FromQuery] DateOnly from, [FromQuery] DateOnly to, IReportHandler handler) =>
+{
     return Results.Ok(await handler.GetRoomUtilizationsAsync(from, to));
 })
 .WithName("Room utilization")
