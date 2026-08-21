@@ -35,6 +35,4 @@ Documentation file: [click here](docs/documentation.md)
 
 ## To do (most to least valuable)
 
-- Documentation 
-- Configurations
 - Metrics
