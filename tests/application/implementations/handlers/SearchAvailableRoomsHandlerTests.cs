@@ -7,11 +7,11 @@ using Moq;
 namespace ABP.Tests.Application.Implementations.Handlers;
 
 [TestFixture]
-public class SearchRoomsHandlerTests
+public class SearchAvailableRoomsHandlerTests
 {
     private Mock<IBookingRepository> _bookingRepository = null!;
     private Mock<IRoomRepository> _roomRepository = null!;
-    private SearchRoomsHandler _handler = null!;
+    private SearchAvailableRoomsHandler _handler = null!;
 
     [SetUp]
     public void SetUp()
@@ -19,7 +19,7 @@ public class SearchRoomsHandlerTests
         _bookingRepository = new Mock<IBookingRepository>();
         _roomRepository = new Mock<IRoomRepository>();
 
-        _handler = new SearchRoomsHandler(
+        _handler = new SearchAvailableRoomsHandler(
             _bookingRepository.Object,
             _roomRepository.Object);
     }
@@ -40,13 +40,13 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchAvailableRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
             5);
 
-        var result = await _handler.SearchRoomsAsync(command);
+        var result = await _handler.SearchAvailableAsync(command);
 
         Assert.Multiple(() =>
         {
@@ -84,13 +84,13 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchAvailableRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
             5);
 
-        var result = await _handler.SearchRoomsAsync(command);
+        var result = await _handler.SearchAvailableAsync(command);
 
         Assert.Multiple(() =>
         {
@@ -134,13 +134,13 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([booking1, booking2]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchAvailableRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
             5);
 
-        var result = await _handler.SearchRoomsAsync(command);
+        var result = await _handler.SearchAvailableAsync(command);
 
         Assert.Multiple(() =>
         {
@@ -165,13 +165,13 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchAvailableRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
             5);
 
-        var result = await _handler.SearchRoomsAsync(command);
+        var result = await _handler.SearchAvailableAsync(command);
 
         Assert.Multiple(() =>
         {
@@ -195,13 +195,13 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchAvailableRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
             5);
 
-        var result = await _handler.SearchRoomsAsync(command);
+        var result = await _handler.SearchAvailableAsync(command);
 
         Assert.Multiple(() =>
         {
@@ -227,13 +227,13 @@ public class SearchRoomsHandlerTests
                 It.IsAny<DateTime>()))
             .ReturnsAsync([]);
 
-        var command = new SearchRoomsCommand(
+        var command = new SearchAvailableRoomsCommand(
             new DateOnly(2026, 8, 20),
             new TimeOnly(10, 0),
             new TimeOnly(12, 0),
             5);
 
-        var result = await _handler.SearchRoomsAsync(command);
+        var result = await _handler.SearchAvailableAsync(command);
 
         Assert.Multiple(() =>
         {

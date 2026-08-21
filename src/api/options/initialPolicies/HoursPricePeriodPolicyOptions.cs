@@ -2,7 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ABP.Api.Options.InitialPolicies;
 
-public class HoursPricePeriodPolicyOptions { 
+public class HoursPricePeriodPolicyOptions
+{
     public const string ConfigurationSectionName = "HoursPricePeriodPolicies";
 
     [Required]

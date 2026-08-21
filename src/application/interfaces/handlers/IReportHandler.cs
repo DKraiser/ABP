@@ -1,4 +1,5 @@
 using ABP.Application.Dto.Infos;
+using ABP.Domain.Result;
 
 namespace ABP.Application.Interfaces.Handlers;
 
@@ -12,5 +13,12 @@ public interface IReportHandler
     /// </summary>
     /// <param name="from">Start of period.</param>
     /// <param name="to">End of period.</param>
-    public Task<IReadOnlyList<RoomUtilizationInfo>> GetRoomUtilizationsAsync(DateOnly from, DateOnly to);
+    public Task<Result<IEnumerable<RoomUtilizationInfo>>> GetRoomUtilizationsAsync(DateOnly from, DateOnly to);
+
+    /// <summary>
+    /// Lists total revenue in stated period each room has had.
+    /// </summary>
+    /// <param name="from">Start of period.</param>
+    /// <param name="to">End of period.</param>
+    public Task<Result<IEnumerable<RoomRevenueInfo>>> GetRoomRevenuesAsync(DateOnly from, DateOnly to);
 }

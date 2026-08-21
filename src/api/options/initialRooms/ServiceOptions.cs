@@ -10,5 +10,5 @@ public sealed class ServiceOptions
 
     [Required]
     [Range(0, int.MaxValue)]
-    public decimal Price { get; set; }   
+    public decimal Price { get; set; }
 }

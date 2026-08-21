@@ -7,7 +7,7 @@ using ABP.Domain.Result;
 
 namespace ABP.Application.Implementations.Handlers;
 
-public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepository roomRepository) : ISearchRoomsHandler
+public class SearchAvailableRoomsHandler(IBookingRepository bookingRepository, IRoomRepository roomRepository) : ISearchAvailableRoomsHandler
 {
     private readonly IBookingRepository _bookingRepository = bookingRepository;
     private readonly IRoomRepository _roomRepository = roomRepository;
@@ -18,7 +18,7 @@ public class SearchRoomsHandler(IBookingRepository bookingRepository, IRoomRepos
     /// <param name="command">Criteria room have to match.</param>
     /// <returns>`Result<string>.Success()` with `id` if created successfully.</returns>
     /// <returns>`Result<string>.Failure(DomainRulesViolationError)` if criteria violate domain rules.</returns>
-    public async Task<Result<IReadOnlyList<RoomInfo>>> SearchRoomsAsync(SearchRoomsCommand command)
+    public async Task<Result<IReadOnlyList<RoomInfo>>> SearchAvailableAsync(SearchAvailableRoomsCommand command)
     {
         var from = command.Date.ToDateTime(command.StartTime);
         var to = command.Date.ToDateTime(command.EndTime);
