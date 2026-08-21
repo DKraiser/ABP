@@ -14,8 +14,6 @@ Room management is implemented as an application use case over the `Room` domain
 - REST endpoints expose CRUD operations.
 - `Result` objects are used to represent expected application failures such as not-found and conflict cases.
 
----
-
 ## 2. Search for Available Rooms
 
 ### Business task
@@ -24,9 +22,7 @@ Allow customers to find rooms that:
 - are not already booked during the requested period.
 
 ### Technical solution
-`SearchRoomsHandler` obtains rooms and overlapping bookings from their respective repositories, filters rooms by capacity, removes rooms with conflicting bookings, and returns `RoomInfo` DTOs.
-
----
+`SearchAvailableRoomsHandler` obtains rooms and overlapping bookings from their respective repositories, filters rooms by capacity, removes rooms with conflicting bookings, and returns `RoomInfo` DTOs.
 
 ## 3. Room Booking
 
@@ -54,8 +50,6 @@ A booking must:
 
 This keeps business rules in the domain and allows booking and pricing policies to be added independently.
 
----
-
 ## 4. Dynamic Booking Pricing
 
 ### Business task
@@ -65,8 +59,6 @@ Calculate booking prices according to the time of day and requested additional s
 Pricing is separated from the booking handler through the `IPricingPolicy` abstraction. Individual pricing policies calculate their part of the price, while the booking handler combines their results.
 
 This makes pricing rules replaceable and allows additional pricing policies to be introduced without modifying the booking workflow.
-
----
 
 ## 5. Business Reports
 
@@ -79,10 +71,9 @@ The application provides reporting use cases based on existing rooms and booking
 Example reports include:
 
 - **Room utilization** — shows how much of the available time each room is booked.
+- **Room revenue** — shows how much money was earned with each room.
 
 Reports are implemented as application-level queries that aggregate domain data into dedicated report DTOs.
-
----
 
 ## 6. Error Handling
 
@@ -103,6 +94,21 @@ Unexpected infrastructure failures are allowed to propagate and can be handled b
 
 ---
 
-## Architecture
+# Architecture
 
-The application follows a layered architecture described in Uncle Bob's book "Clean architecture".
+The application follows a layered architecture described in Uncle Bob's book "Clean architecture" with clean responsibility separation:
+
+ - `Domain` layer - domain entities with constant rules.
+ - `Application` layer - application business logic and use cases used by users.
+ - `Infrastructure` layer - implementations of different adapters (repositories etc).
+ - `Api` layer - endpoints, configurations.  
+
+---
+
+# Code quality
+
+Code base was developped according to "Clean code" principles:
+ 
+ - Meaningful variable, function, class names.
+ - Code is well documented.
+ - No god objects.

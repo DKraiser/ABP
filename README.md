@@ -33,6 +33,15 @@ API overview: `http://localhost:5225/scalar`
 
 Documentation file: [click here](docs/documentation.md)
 
-## To do (most to least valuable)
+## To do
 
 - Metrics
+
+## Done
+
+- Domain
+- Applicaion
+- Infrastructure
+- Api
+- Configuration
+- Healthchecks
