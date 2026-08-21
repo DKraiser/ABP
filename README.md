@@ -7,7 +7,7 @@
 
 ## Overview
 
-This project is a small test for job application to ABP company. In this project, simple booking system with in-memory storage is implemented. 
+This project is a small test for job application to ABP company. In this project, simple booking system API with in-memory storage is implemented.
 
 ## Tech stack
 
@@ -17,7 +17,7 @@ This project is a small test for job application to ABP company. In this project
 
 ## Quick start
 
-To run application:
+To run application locally:
 
 ```bash
 # To run use
@@ -29,7 +29,21 @@ dotnet test
 dotnet test tests/[tested_layer]
 ```
 
-API overview: `http://localhost:5225/scalar`
+To run in container use:
+
+```bash
+# Build an image 
+docker build . -t abp:latest
+
+# Run in development mode 
+docker run -p 8080:8080 --name abp --rm -ti -e ASPNETCORE_ENVIRONMENT=Development abp:latest
+# Or in staging
+docker run -p 8080:8080 --name abp --rm -ti -e ASPNETCORE_ENVIRONMENT=Staging abp:latest
+# Or in production 
+docker run -p 8080:8080 --name abp --rm -ti -e ASPNETCORE_ENVIRONMENT=Production abp:latest
+```
+
+API overview: `http://localhost:8080/scalar`
 
 Documentation file: [click here](docs/documentation.md)
 
@@ -45,3 +59,4 @@ Documentation file: [click here](docs/documentation.md)
 - Api
 - Configuration
 - Healthchecks
+- Containerization

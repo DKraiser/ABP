@@ -1,0 +1,6 @@
+[Bb]uild/
+[Dd]ocs/
+[Tt]ests/
+Dockerfile
+Directory.Build.props
+README.md
